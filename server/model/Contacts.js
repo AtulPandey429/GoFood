@@ -12,8 +12,8 @@ const contactSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  phone: {
-    type: String, // Assuming you have a 'phone' field in your schema
+  password: {
+    type: String, // Assuming you have a 'password' field in your schema
     required: true,
   },
   date: {

@@ -21,15 +21,15 @@ const Contacts = require("../model/Contacts");
 const asyncHandler = require("express-async-handler");
 const CreateContacts = asyncHandler(async (req, res) => {
   console.log("here are apis", req.body);
-  const { name, email, phone, location } = req.body;
-  if (!name || !email || !phone || !location) {
+  const { name, email, password, location } = req.body;
+  if (!name || !email || !password || !location) {
     res.status(400);
     throw new Error("all field are mandatory");
   }
   const createCont = await Contacts.create({
     name,
     email,
-    phone,
+    password,
     location,
   });
   res.status(200).json(createCont);

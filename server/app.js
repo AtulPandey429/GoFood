@@ -1,14 +1,37 @@
 const express = require("express");
 const app = express();
-const db = require("./model/db"); // Corrected the path to the db.js file
+const cors = require("cors");
+const db = require("./model/db");
+const port = process.env.PORT || 3000;
+
+// Connect to the database
 db();
+
+// Allow requests from all origins during development
+app.use(cors());
+
+// Parse JSON request bodies
 app.use(express.json());
+
+// Set custom CORS headers
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
+// Sample route
 app.get("/", (req, res) => {
   res.send("hello");
 });
-app.use("/api/user", require("./routers/CreateUser")); // Corrected the path to the CreateUser.js file
 
-const port = process.env.PORT || 3000;
+// Use the user route
+app.use("/api/user", require("./routers/CreateUser"));
+
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
