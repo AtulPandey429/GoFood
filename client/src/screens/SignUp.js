@@ -12,26 +12,25 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const res = await fetch("http://localhost:4000/api/user", {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({
-            name: credential.name,
-            email: credential.email,
-            password: credential.password,
-            location: credential.geolocation,
-          }),
-        });
+      const res = await fetch("http://localhost:4000/api/user/signup", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          name: credential.name,
+          email: credential.email,
+          password: credential.password,
+          location: credential.geolocation,
+        }),
+      });
 
-        const json = await res.json();
-        console.log(json);
+      const json = await res.json();
+      console.log(json);
     } catch (error) {
-        console.error("Error fetching data:", error);
+      console.error("Error fetching data:", error);
     }
-};
-
+  };
 
   const getValue = (v) => {
     setCredential({ ...credential, [v.target.name]: v.target.value });

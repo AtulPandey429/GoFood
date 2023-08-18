@@ -8,11 +8,13 @@
 
 const express = require("express");
 const Routes = express.Router();
-const { CreateContacts } = require("../controllers/editContact"); // Import the CreateContacts function
+const { CreateContacts, LoginUser } = require("../controllers/editContact"); // Import the CreateContacts function
 
 const { validateContactData } = require("../middleware/validation");
+const { validateLoginData } = require("../middleware/LoginValidation");
 
-Routes.use(validateContactData);
-Routes.post("/", CreateContacts); // Use the CreateContacts function as the callback
+Routes.post("/signup", validateContactData, CreateContacts);
+// Use the CreateContacts function as the callback
+Routes.post("/login", LoginUser);
 
 module.exports = Routes;

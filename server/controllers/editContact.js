@@ -1,23 +1,6 @@
 const express = require("express");
-const routes = express.Router();
+// const routes = express.Router();
 const Contacts = require("../model/Contacts");
-
-// routes.post('/createuser', async (req, res) => {
-//     try {
-//         await User.create({
-//             name:req.body.name,
-//             email:req.body.email,
-//             password:req.body.password,
-//             location:req.body.location,
-
-//         });
-
-//         res.json({success:true });
-//     } catch (error) {
-//         console.log(error.message);
-//         res.json({success:false });
-//     }
-// });
 const asyncHandler = require("express-async-handler");
 const CreateContacts = asyncHandler(async (req, res) => {
   console.log("here are apis", req.body);
@@ -34,5 +17,28 @@ const CreateContacts = asyncHandler(async (req, res) => {
   });
   res.status(200).json(createCont);
 });
+const LoginUser = asyncHandler(async (req, res) => {
+  const email = req.body.email;
 
-module.exports = { CreateContacts };
+  try {
+    let userData = await Contacts.findOne({ email });
+
+    // Check if a user with the provided email exists
+    if (!userData) {
+      return res.status(400).json({ errors: "Incorrect email " });
+    }
+
+    // Compare the provided password with the stored password
+    if (req.body.password !== userData.password) {
+      return res.status(400).json({ errors: "Incorrect password" });
+    }
+
+    // If both email and password match, return a success response
+    return res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+module.exports = { CreateContacts, LoginUser };
