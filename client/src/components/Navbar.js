@@ -4,18 +4,33 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
   return (
     <div>
-      <nav className="navbar navbar-expand-lg text-danger fs-2  bg-success">
+      <nav className="navbar navbar-expand-lg text-danger fs-3 bg-success">
         <div className="container-fluid">
           <div className="d-flex align-items-center">
             <Link
-              className="navbar-brand fs-1 text-white font-size-bold"
+              className="navbar-brand fs-1 text-white font-weight-bold"
               to="/"
             >
               GoFood
             </Link>
           </div>
 
-          <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+
+          <div
+            className="collapse navbar-collapse justify-content-between"
+            id="navbarNav"
+          >
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link
@@ -26,14 +41,16 @@ const Navbar = () => {
                   Home
                 </Link>
               </li>
+            </ul>
 
+            <ul className="navbar-nav">
               <li className="nav-item">
-                <Link className="nav-link" to="/login">
+                <Link className="nav-link text-white" to="/login">
                   Login
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/signup">
+                <Link className="nav-link text-white" to="/signup">
                   SignUp
                 </Link>
               </li>

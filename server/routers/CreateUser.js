@@ -1,20 +1,13 @@
-// const express = require("express");
-// const Routes = express.Router();
-// // const CreateContacts = require("../controllers/editContact");
-
-// Routes.post("/", require("../controllers/editContact"));
-
-// module.exports = Routes;
-
 const express = require("express");
 const Routes = express.Router();
-const { CreateContacts, LoginUser } = require("../controllers/editContact"); // Import the CreateContacts function
+const { CreateContacts, LoginUser } = require("../controllers/editContact"); // Import controller functions
 
 const { validateContactData } = require("../middleware/validation");
-const { validateLoginData } = require("../middleware/LoginValidation");
 
+// Route for user signup
 Routes.post("/signup", validateContactData, CreateContacts);
-// Use the CreateContacts function as the callback
+
+// Route for user login
 Routes.post("/login", LoginUser);
 
 module.exports = Routes;

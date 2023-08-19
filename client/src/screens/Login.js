@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const [credential, setCredential] = useState({
     email: "",
     password: "",
   });
+  let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +24,11 @@ const Login = () => {
 
       const json = await res.json();
       console.log(json);
+      if (json.success) {
+        localStorage.setItem("authToken", json.authToken);
+        console.log(localStorage.getItem("authToken"));
+        navigate("/");
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
