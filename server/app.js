@@ -17,6 +17,7 @@ app.get("/", (req, res) => {
 });
 // Use the user route
 app.use("/api/user", require("./routers/CreateUser"));
+app.use("/api/user", require("./routers/Display"));
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
