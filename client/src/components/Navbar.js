@@ -1,7 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import "../index.css"
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const handleClick = ()=>{
+    localStorage.removeItem('authToken');
+    navigate('/');
+  }
   return (
     <div>
       <nav className="navbar navbar-expand-lg text-danger fs-3 bg-success">
@@ -41,20 +47,47 @@ const Navbar = () => {
                   Home
                 </Link>
               </li>
+              {(localStorage.getItem('authToken')) ?
+            <li className="nav-item">
+            <Link
+              className="nav-link active text-white"
+              aria-current="page"
+              to="#"
+            >
+              My Order
+            </Link>
+          </li> : "" 
+            }
             </ul>
 
-            <ul className="navbar-nav">
+              {(!localStorage.getItem("authToken")) ? 
+            <ul className="navbar-nav  ">
               <li className="nav-item">
+              <button  className="btn btn-danger login-button ">
+
                 <Link className="nav-link text-white" to="/login">
                   Login
                 </Link>
+                </button>
               </li>
               <li className="nav-item">
+              <button  className="btn btn-primary login-button ">
+
                 <Link className="nav-link text-white" to="/signup">
                   SignUp
                 </Link>
+                </button>
+              </li>
+              </ul> :
+              <ul className="navbar-nav">
+               <li className="nav-item">
+                <button  className="btn btn-info login-button " onClick={handleClick}>
+                  LogOut
+                </button>
               </li>
             </ul>
+              }
+              
           </div>
         </div>
       </nav>

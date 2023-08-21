@@ -12,10 +12,10 @@ const Card = (props) => {
             src={props.imgsrc}
             className="card-img-top"
             style={{
-              width: "100%",
-              height: "auto",
+              width: "auto",
+              height: "170px",
               maxHeight: "15rem",
-              objectFit: "cover",
+              objectFit: "fill",
               objectPosition: "center",
             }}
             alt="..."

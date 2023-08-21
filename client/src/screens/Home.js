@@ -74,7 +74,7 @@ const Home = () => {
                 style={{
                   filter: "brightness(30%)",
                   width: "100%",
-                  objectFit: "cover",
+                  objectFit: "fill",
                   objectPosition: "center",
                 }}
                 alt="..."
@@ -85,10 +85,10 @@ const Home = () => {
                 src="https://source.unsplash.com/random/900×700/?burger"
                 className="d-block w-100"
                 style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
                   filter: "brightness(30%)",
                   width: "100%",
+                  objectFit: "fill",
+                  objectPosition: "center",
                 }}
                 alt="..."
               />
@@ -98,10 +98,10 @@ const Home = () => {
                 src="https://source.unsplash.com/random/900×700/?pasta"
                 className="d-block w-100"
                 style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
                   filter: "brightness(30%)",
                   width: "100%",
+                  objectFit: "fill",
+                  objectPosition: "center",
                 }}
                 alt="..."
               />
@@ -137,9 +137,10 @@ const Home = () => {
       <div className="container">
         {foodCategory.length !== 0
           ? foodCategory.map((ele) => (
-              <div key={ele._id} className="row mb-3 ">
+              <div key={ele._id} className="row  ">
                 <div className="fs-3 m-3 ">{ele.CategoryName}</div>
                 <hr />
+                
                 {foodItem.length !== 0
                   ? foodItem
                       .filter(
@@ -152,7 +153,12 @@ const Home = () => {
                       .map((filterItem) => (
                         <div
                           key={filterItem._id}
-                          className="col-12 col-md-6 col-lg-3 "
+                          className="
+                          m-lg-2
+                          m-md-5
+
+                          col-12 col-md-4
+                           col-lg-3 "
                         >
                           {/* Replace Card with your actual component */}
                           <Card
