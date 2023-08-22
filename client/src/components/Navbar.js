@@ -71,7 +71,7 @@ const Navbar = () => {
                 </button>
               </li>
               <li className="nav-item">
-              <button  className="btn btn-primary login-button ">
+              <button  className="btn btn- login-button ">
 
                 <Link className="nav-link text-white" to="/signup">
                   SignUp
@@ -80,6 +80,11 @@ const Navbar = () => {
               </li>
               </ul> :
               <ul className="navbar-nav">
+               <li className="nav-item">
+                <button  className="btn btn-info login-button " >
+                  My Cart
+                </button>
+              </li>
                <li className="nav-item">
                 <button  className="btn btn-info login-button " onClick={handleClick}>
                   LogOut

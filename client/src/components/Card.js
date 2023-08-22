@@ -25,9 +25,9 @@ const Card = (props) => {
             <h5 className="card-title">{props.name}</h5>
 
             <div className="container w-100">
-              <div className="row">
-                <div className="col">
-                  <select className="w-30 bg-success ">
+              <div className="row ">
+                <div className="col ">
+                  <select className="text-bold btn btn-danger ">
                     {Array.from(Array(6), (el, i) => {
                       return (
                         <option key={i + 1} value={i + 1}>
@@ -37,18 +37,28 @@ const Card = (props) => {
                     })}
                   </select>
                 </div>
-                <div className="col">
-                  <select className="w-30 text-bold bg-success ">
+                <div className="col ">
+                  <select className=" text-bold btn btn-danger ">
                     {priceOption.map((data) => {
                       return (
-                        <option key={data} value={data}>
+                        <option className="text-white" key={data} value={data}>
                           {data}
                         </option>
                       );
                     })}
                   </select>
                 </div>
-                <div className="col">TotalPrice</div>
+                
+                <br />
+                <br />
+               
+                <hr />
+                <div className="row">
+                <div className="col">
+                   TotalPrice</div>
+                <div className="col btn btn-info">Add to cart</div>
+
+                </div>
               </div>
             </div>
           </div>

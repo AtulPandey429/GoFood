@@ -10,10 +10,12 @@ import "../node_modules/bootstrap/dist/js/bootstrap.bundle";
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import Login from './screens/Login';
 import SignUp from "./screens/SignUp";
+import { CartProvider } from "./components/ContextReducer";
 
 function App() {
   return (
     <>
+    <CartProvider>
       <Router>
         <div className="App">
           <Routes>
@@ -27,6 +29,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </CartProvider>
     </>
   );
 }

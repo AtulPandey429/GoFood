@@ -140,7 +140,7 @@ const Home = () => {
               <div key={ele._id} className="row  ">
                 <div className="fs-3 m-3 ">{ele.CategoryName}</div>
                 <hr />
-                
+
                 {foodItem.length !== 0
                   ? foodItem
                       .filter(
@@ -154,7 +154,7 @@ const Home = () => {
                         <div
                           key={filterItem._id}
                           className="
-                          m-lg-2
+                          m-lg-4
                           m-md-5
 
                           col-12 col-md-4
