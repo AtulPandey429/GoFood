@@ -162,9 +162,9 @@ const Home = () => {
                         >
                           {/* Replace Card with your actual component */}
                           <Card
-                            name={filterItem.name}
+                           foodItem = {filterItem}
                             option={filterItem.options[0]}
-                            imgsrc={filterItem.img}
+                            
                           />
                         </div>
                       ))
