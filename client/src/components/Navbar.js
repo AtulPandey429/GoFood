@@ -1,17 +1,24 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import  Badge  from   'react-bootstrap/Badge'
-import "../index.css"
+import Badge from "@material-ui/core/Badge";
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import "../index.css";
 import Modal from "../screens/Modal";
 import Cart from "../screens/Cart";
+import { useCart } from "./ContextReducer";
 
 const Navbar = () => {
-  const [cartView, setcartView] = useState(false)
+  const [cartView, setcartView] = useState(false);
   const navigate = useNavigate();
-  const handleClick = ()=>{
-    localStorage.removeItem('authToken');
-    navigate('/');
-  }
+  const handleClick = () => {
+    localStorage.removeItem("authToken");
+    navigate("/");
+  };
+  const loadCart = () => {
+    setcartView(true);
+  };
+
+  const items = useCart();
   return (
     <div>
       <nav className="navbar navbar-expand-lg text-danger fs-3 bg-success">
@@ -51,54 +58,71 @@ const Navbar = () => {
                   Home
                 </Link>
               </li>
-              {(localStorage.getItem('authToken')) ?
-            <li className="nav-item">
-            <Link
-              className="nav-link active text-white"
-              aria-current="page"
-              to="#"
-            >
-              My Order
-            </Link>
-          </li> : "" 
-            }
+              {localStorage.getItem("authToken") ? (
+                <li className="nav-item">
+                  <Link
+                    className="nav-link active text-white"
+                    aria-current="page"
+                    to="/myOrder"
+                  >
+                    My Order
+                  </Link>
+                </li>
+              ) : (
+                ""
+              )}
             </ul>
 
-              {(!localStorage.getItem("authToken")) ? 
-            <ul className="navbar-nav  ">
-              <li className="nav-item">
-              <button  className="btn btn-danger login-button ">
-
-                <Link className="nav-link text-white" to="/login">
-                  Login
-                </Link>
-                </button>
-              </li>
-              <li className="nav-item">
-              <button  className="btn btn- login-button ">
-
-                <Link className="nav-link text-white" to="/signup">
-                  SignUp
-                </Link>
-                </button>
-              </li>
-              </ul> :
+            {!localStorage.getItem("authToken") ? (
+              <ul className="navbar-nav  ">
+                <li className="nav-item">
+                  <button className="btn btn-danger login-button ">
+                    <Link className="nav-link text-white" to="/login">
+                      Login
+                    </Link>
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn- login-button ">
+                    <Link className="nav-link text-white" to="/signup">
+                      SignUp
+                    </Link>
+                  </button>
+                </li>
+              </ul>
+            ) : (
               <ul className="navbar-nav">
-               <li className="nav-item">
-                <button  className="btn btn-info login-button " onClick={()=>{setcartView(true)}} >
-                  My Cart
-                  <Badge   pill  bg="danger">2</Badge>
-                </button>
-              </li>
-              {cartView ? <Modal onClose={()=>{setcartView(false)}}> <Cart/></Modal>: null}
-               <li className="nav-item">
-                <button  className="btn btn-info login-button " onClick={handleClick}>
-                  LogOut
-                </button>
-              </li>
-            </ul>
-              }
-              
+                <li className="nav-item">
+                  <button
+                    className="btn btn-danger login-button "
+                    onClick={loadCart}
+                  >
+                    <Badge color="secondary" badgeContent={items.length}>
+                      <ShoppingCartIcon />
+                    </Badge>
+                    Cart
+                  </button>
+                </li>
+                {cartView ? (
+                  <Modal
+                    onClose={() => {
+                      setcartView(false);
+                    }}
+                  >
+                    {" "}
+                    <Cart />
+                  </Modal>
+                ) : null}
+                <li className="nav-item">
+                  <button
+                    className="btn btn-info login-button "
+                    onClick={handleClick}
+                  >
+                    LogOut
+                  </button>
+                </li>
+              </ul>
+            )}
           </div>
         </div>
       </nav>

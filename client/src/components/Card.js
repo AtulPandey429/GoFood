@@ -13,19 +13,40 @@ const Card = (props) => {
   const priceRef = useRef();
   const [qty, setQty] = useState(1);
   const [size, setSize] = useState("");
+  const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = async () => {
-    await dispatch({
-      type: "ADD",
-      id: props.foodItem._id,
-      name: props.foodItem.name,
-      price: finalPrice,
-      qty,
-      size,
-    });
+    let existingItem = data.find(
+      (item) => item.id === props.foodItem._id && item.size === size
+    );
 
-    console.log(data);
+    if (existingItem) {
+      // Update existing item in the cart
+      await dispatch({
+        type: "UPDATE",
+        id: props.foodItem._id,
+        price: finalPrice,
+        qty,
+        size,
+      });
+      setIsAdded(true);
+      setTimeout(() => {
+        setIsAdded(false); // Reset button text to "Added to cart"
+      }, 2000);
+    } else {
+      // Add new item to the cart
+      await dispatch({
+        type: "ADD",
+        id: props.foodItem._id,
+        name: props.foodItem.name,
+        price: finalPrice,
+        qty,
+        size,
+      });
+      setIsAdded(true);
+    }
   };
+
   let finalPrice = qty * parseInt(option[size]);
   useEffect(() => setSize(priceRef.current.value), []);
 
@@ -88,12 +109,17 @@ const Card = (props) => {
                 <div className="row">
                   <div className="col">
                     <p>
-                      Price: <FontAwesomeIcon icon={faRupeeSign} />
-                      / {finalPrice}
+                      Price: <FontAwesomeIcon icon={faRupeeSign} />/{" "}
+                      {finalPrice}
                     </p>
                   </div>
-                  <div className="col btn btn-info" onClick={handleAddToCart}>
-                    Add to cart
+                  <div
+                    className={`col btn  login-button ${
+                      isAdded ? "btn-success" : "btn-info"
+                    }`}
+                    onClick={handleAddToCart}
+                  >
+                    {isAdded ? "Added to cart" : "Add to cart"}
                   </div>
                 </div>
               </div>

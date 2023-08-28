@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer } from "react";
+// import { castObject } from "../../../server/model/Order";
 
 const CartStateContext = createContext();
 const CartDispatchContext = createContext();
@@ -17,7 +18,25 @@ const reducer = (state, action) => {
         },
       ];
       break;
-
+    case "REMOVE":
+      let newArr = [...state];
+      newArr.splice(action.index, 1);
+      return newArr;
+    case "UPDATE":
+      let arr = [...state];
+      arr.find((food, index) => {
+        if (food.id === action.id) {
+          arr[index] = {
+            ...food,
+            qty: parseInt(action.qty) + food.qty,
+            price: action.price + food.price,
+          };
+        }
+      });
+      return arr; // Moved this line outside of the find callback
+case "DROP" :
+  let empArr = [];
+  return empArr;
     default:
       console.log("error in reducer");
       break;

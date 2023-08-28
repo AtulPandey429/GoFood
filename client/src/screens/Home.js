@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Card from "./../components/Card";
+import "../index.css"
 
 const Home = () => {
   const [search, setSearch] = useState("");
@@ -40,13 +41,13 @@ const Home = () => {
       <div>
         <Navbar />
       </div>
-      <div>
+      <div className="car-container">
         <div
           id="carouselExampleControls"
           className="carousel slide"
           data-bs-ride="carousel"
         >
-          <div className="carousel-inner " style={{ maxHeight: "650px" }}>
+          <div className="carousel-inner  " style={{ maxHeight: "650px" }}>
             <div className="carousel-caption" style={{ zIndex: 1 }}>
               <div class="d-flex justify-content-center">
                 <input
@@ -162,9 +163,8 @@ const Home = () => {
                         >
                           {/* Replace Card with your actual component */}
                           <Card
-                           foodItem = {filterItem}
+                            foodItem={filterItem}
                             option={filterItem.options[0]}
-                            
                           />
                         </div>
                       ))
