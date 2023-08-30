@@ -22,3 +22,99 @@ code {
 .login-button {
  margin: 10px;
 }
+.navbar{
+  background: #3bc966;
+}
+.grid-container {
+  padding: 20px;
+}
+
+.date-heading {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.item-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Rest of the styles remain the same as before */
+
+.item-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+}
+
+.order-info {
+  text-align: center;
+}
+
+.order-date {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 10px 0;
+}
+
+.item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.item-image {
+  height: 120px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.item-details {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.item-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.item-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.item-quantity,
+.item-size,
+.item-price {
+  margin: 0 5px;
+}
+
+.item-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #e74c3c;
+}

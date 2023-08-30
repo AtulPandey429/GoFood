@@ -25,7 +25,7 @@ const Navbar = () => {
         <div className="container-fluid">
           <div className="d-flex align-items-center">
             <Link
-              className="navbar-brand fs-1 text-white font-weight-bold"
+              className="navbar-brand fs-3 text-white font-weight-bold"
               to="/"
             >
               GoFood
@@ -51,9 +51,9 @@ const Navbar = () => {
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link
-                  className="nav-link active text-white"
+                  className="nav-link active text-white fs-5"
                   aria-current="page"
-                  to="#"
+                  to="/"
                 >
                   Home
                 </Link>
@@ -61,7 +61,7 @@ const Navbar = () => {
               {localStorage.getItem("authToken") ? (
                 <li className="nav-item">
                   <Link
-                    className="nav-link active text-white"
+                    className="nav-link active text-white fs-5"
                     aria-current="page"
                     to="/myOrder"
                   >

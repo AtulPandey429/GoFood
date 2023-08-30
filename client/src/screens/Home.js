@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Card from "./../components/Card";
-import "../index.css"
+import "../index.css";
 
 const Home = () => {
   const [search, setSearch] = useState("");
@@ -47,7 +47,10 @@ const Home = () => {
           className="carousel slide"
           data-bs-ride="carousel"
         >
-          <div className="carousel-inner  " style={{ maxHeight: "650px" }}>
+          <div
+            className="carousel-inner m-auto "
+            style={{ maxHeight: "400px" }}
+          >
             <div className="carousel-caption" style={{ zIndex: 1 }}>
               <div class="d-flex justify-content-center">
                 <input
@@ -60,17 +63,14 @@ const Home = () => {
                     setSearch(e.target.value);
                   }}
                 />
-                {/* <button
-                  class="btn btn-outline-none text-white bg-success p-2"
-                  type="submit"
-                >
-                  Search
-                </button> */}
               </div>
             </div>
             <div className="carousel-item active">
+            <img src="https://source.unsplash.com/random/900x700/?burger" className="d-block w-100  " style={{ filter: "brightness(30%)" }} alt="..." />
+            </div>
+            <div className="carousel-item">
               <img
-                src="https://source.unsplash.com/random/900×700/?maggi"
+                src="https://media.istockphoto.com/id/1398630614/photo/bacon-cheeseburger-on-a-toasted-bun.jpg?s=1024x1024&w=is&k=20&c=rXM2ry9bme764bKBGagwq4jYdjr7q98UiJLyHrl6BUU="
                 className="d-block w-100"
                 style={{
                   filter: "brightness(30%)",
@@ -83,20 +83,7 @@ const Home = () => {
             </div>
             <div className="carousel-item">
               <img
-                src="https://source.unsplash.com/random/900×700/?burger"
-                className="d-block w-100"
-                style={{
-                  filter: "brightness(30%)",
-                  width: "100%",
-                  objectFit: "fill",
-                  objectPosition: "center",
-                }}
-                alt="..."
-              />
-            </div>
-            <div className="carousel-item">
-              <img
-                src="https://source.unsplash.com/random/900×700/?pasta"
+                src="https://media.istockphoto.com/id/1403973419/photo/table-top-of-food-spread-on-table.jpg?s=1024x1024&w=is&k=20&c=MUzQiekBfW_aJnHk-Q0oGwyJyz6K1XUwq-_UZCf1tMM="
                 className="d-block w-100"
                 style={{
                   filter: "brightness(30%)",
@@ -139,8 +126,8 @@ const Home = () => {
         {foodCategory.length !== 0
           ? foodCategory.map((ele) => (
               <div key={ele._id} className="row  ">
-                <div className="fs-3 m-3 ">{ele.CategoryName}</div>
-                <hr />
+                <div className="fs-3 m-2 ">{ele.CategoryName}</div>
+                <hr className="" />
 
                 {foodItem.length !== 0
                   ? foodItem
@@ -155,6 +142,7 @@ const Home = () => {
                         <div
                           key={filterItem._id}
                           className="
+                  
                           m-lg-4
                           m-md-5
 
@@ -165,6 +153,7 @@ const Home = () => {
                           <Card
                             foodItem={filterItem}
                             option={filterItem.options[0]}
+                            img={filterItem.img}
                           />
                         </div>
                       ))

@@ -1,0 +1,52 @@
+.my-order-page {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .order-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .order-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+  
+  .order-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .order-header {
+    margin-bottom: 10px;
+  }
+  
+  .order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .order-item {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .item-image {
+    max-width: 80px;
+    max-height: 80px;
+    object-fit: cover;
+  }
+  
+  .item-details {
+    flex: 1;
+  }
+  
+  .order-total {
+    text-align: right;
+  }
+  

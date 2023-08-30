@@ -2,14 +2,14 @@ import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRupeeSign } from "@fortawesome/free-solid-svg-icons";
 import { useDispatchCart, useCart } from "./ContextReducer";
-
+import "../card.css"
 const Card = (props) => {
   const option = props.option;
   const priceOption = Object.keys(option);
-  // const priceOp = Object.values(option);
-  //  let foodItem = props.foodItem;
+
   const data = useCart();
   const dispatch = useDispatchCart();
+
   const priceRef = useRef();
   const [qty, setQty] = useState(1);
   const [size, setSize] = useState("");
@@ -40,6 +40,7 @@ const Card = (props) => {
         id: props.foodItem._id,
         name: props.foodItem.name,
         price: finalPrice,
+        img: props.foodItem.img,
         qty,
         size,
       });
@@ -51,78 +52,54 @@ const Card = (props) => {
   useEffect(() => setSize(priceRef.current.value), []);
 
   return (
-    <div>
-      <div>
-        <div className="card m-4 " style={{ width: "20rem", height: "20rem" }}>
-          <img
-            src={props.foodItem.img}
-            className="card-img-top"
-            style={{
-              width: "auto",
-              height: "170px",
-              maxHeight: "15rem",
-              objectFit: "fill",
-              objectPosition: "center",
-            }}
-            alt="..."
-          />
+    <div className="card-container">
+      <div className="card">
+        <img
+          src={props.foodItem.img}
+          className="card-img-top card-image"
+          alt="..."
+          
+        />
 
-          <div className="card-body bg-dark text-white">
-            <h5 className="card-title">{props.foodItem.name}</h5>
+        <div className="card-body card-details">
+          <h5 className="card-title card-name">{props.foodItem.name}</h5>
 
-            <div className="container w-100">
-              <div className="row ">
-                <div className="col ">
-                  <select
-                    className="text-bold btn btn-danger "
-                    onChange={(e) => setQty(e.target.value)}
-                  >
-                    {Array.from(Array(6), (el, i) => {
-                      return (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-                <div className="col ">
-                  <select
-                    className=" text-bold btn btn-danger "
-                    ref={priceRef}
-                    onChange={(e) => setSize(e.target.value)}
-                  >
-                    {priceOption.map((data) => {
-                      return (
-                        <option className="text-white" key={data} value={data}>
-                          {data}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
+          <div className="card-options">
+            <select
+              className="card-quantity"
+              onChange={(e) => setQty(e.target.value)}
+            >
+              {Array.from(Array(6), (el, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
 
-                <br />
-                <br />
+            <select
+              className="card-size"
+              ref={priceRef}
+              onChange={(e) => setSize(e.target.value)}
+            >
+              {priceOption.map((data) => (
+                <option className="card-option" key={data} value={data}>
+                  {data}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                <hr />
-                <div className="row">
-                  <div className="col">
-                    <p>
-                      Price: <FontAwesomeIcon icon={faRupeeSign} />/{" "}
-                      {finalPrice}
-                    </p>
-                  </div>
-                  <div
-                    className={`col btn  login-button ${
-                      isAdded ? "btn-success" : "btn-info"
-                    }`}
-                    onClick={handleAddToCart}
-                  >
-                    {isAdded ? "Added to cart" : "Add to cart"}
-                  </div>
-                </div>
-              </div>
+          <div className="card-price-button">
+            <p className="card-price">
+              Price: <FontAwesomeIcon icon={faRupeeSign} /> {finalPrice}
+            </p>
+            <div
+              className={`card-button btn btn-danger ${
+                isAdded ? "added-button" : "add-button"
+              }`}
+              onClick={handleAddToCart}
+            >
+              {isAdded ? "Added to Cart" : "Add to Cart"}
             </div>
           </div>
         </div>
