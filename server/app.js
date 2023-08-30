@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 const db = require("./Config/db");
 const port = process.env.PORT || 3000;
-
+const path = require('path')
 // Connect to the database
 db();
 
@@ -19,7 +19,10 @@ app.get("/", (req, res) => {
 app.use("/api/user", require("./routers/CreateUser"));
 app.use("/api/user", require("./routers/Display"));
 app.use("/api/user", require("./routers/Order"));
-
+app.use(express.static(path.join(__dirname,'../client/build')))
+app.get('*',function(req,res){
+  res.sendFile(path.join(__dirname,'../client/build/index.html'))
+})
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
