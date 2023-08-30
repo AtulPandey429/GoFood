@@ -5,7 +5,7 @@ const mongoUrl = process.env.URL;
 const mongodb = async () => {
   try {
     await mongoose.connect(mongoUrl, { useNewUrlParser: true });
-    console.log("db connected");
+    // console.log("db connected");
 
     const fetched_data = await mongoose.connection.db.collection("food_items");
     const data = await fetched_data.find({}).toArray();
