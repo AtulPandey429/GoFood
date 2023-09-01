@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
+
 const Login = () => {
   const [credential, setCredential] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState(""); // State for error messages
   let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear any previous error
     try {
       const res = await fetch("http://localhost:4000/api/user/login", {
         method: "POST",
@@ -23,15 +26,16 @@ const Login = () => {
       });
 
       const json = await res.json();
-      console.log(json);
       if (json.success) {
         localStorage.setItem("userEmail", credential.email);
         localStorage.setItem("authToken", json.authToken);
-        console.log(localStorage.getItem("authToken"));
         navigate("/");
+      } else {
+        setError("Invalid email or password"); // Set error message
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      setError("An error occurred while logging in"); // Set a generic error message
     }
   };
 
@@ -46,6 +50,8 @@ const Login = () => {
           <div className="card">
             <div className="card-header bg-primary text-white">Login</div>
             <div className="card-body">
+              {error && <div className="alert alert-danger">{error}</div>}{" "}
+              {/* Display error message */}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3 row">
                   <label htmlFor="email" className="col-sm-4 col-form-label">
