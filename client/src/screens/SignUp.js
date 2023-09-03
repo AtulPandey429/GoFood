@@ -12,7 +12,7 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:4000/api/user/signup", {
+      const res = await fetch("https://gofood-ezlb.onrender.com/api/user/signup", {
         method: "POST",
         headers: {
           "Content-type": "application/json",

@@ -11,7 +11,7 @@ const Home = () => {
 
   const loadData = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/user/fooditems", {
+      const response = await fetch("https://gofood-ezlb.onrender.com/api/user/fooditems", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,26 +1,34 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
-const db = require("./Config/db");
-const port = process.env.PORT || 3000;
+const morgan = require("morgan");
 const path = require("path");
+const db = require("./Config/db");
+
+const app = express();
+const port = process.env.PORT || 3000;
+
 // Connect to the database
 db();
 
-// Allow requests from all origins during development
+// Middleware
 app.use(cors());
-
-// Parse JSON request bodies
 app.use(express.json());
+app.use(morgan("dev"));
 
-// Use the user route
+// API routes
 app.use("/api/user", require("./routers/CreateUser"));
 app.use("/api/user", require("./routers/Display"));
 app.use("/api/user", require("./routers/Order"));
+
+// Serve static files
 app.use(express.static(path.join(__dirname, "./client/build")));
-app.get("*", function (req, res) {
+
+// Serve React app for any other routes
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
+
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
