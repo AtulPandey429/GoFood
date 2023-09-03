@@ -80,7 +80,7 @@ const Navbar = () => {
                   </button>
                 </li>
                 <li className="nav-item">
-                  <button className="btn btn- login-button ">
+                  <button className="btn btn-success login-button ">
                     <Link className="nav-link text-white" to="/signup">
                       SignUp
                     </Link>
