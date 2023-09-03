@@ -1,0 +1,96 @@
+/* Footer styles */
+.gofood-footer {
+    background-color: #ff5a5f; /* GoFood's primary color */
+    color: #ffffff; /* Text color */
+    padding: 30px 0;
+    width: 100%;
+  }
+  
+  /* Footer heading styles */
+  .footer-heading {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  /* ... (previous styles) */
+
+/* ... (previous styles) */
+
+/* Back to Top button styles */
+.scroll-to-top-button {
+    display: none; /* Initially hide the button */
+    background-color: #ff5a5f; /* Button background color */
+    color: #ffffff; /* Text color */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* Adjust the button's position from the bottom */
+    right: 20px; /* Adjust the button's position from the right */
+    z-index: 1000; /* Place the button above other content */
+  }
+  
+  /* Show the button when the user scrolls down */
+  body::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  body::-webkit-scrollbar-thumb {
+    background-color: #ff5a5f; /* Scrollbar thumb color */
+  }
+  
+  body::-webkit-scrollbar-thumb:hover {
+    background-color: #ffdb58; /* Scrollbar thumb color on hover */
+  }
+  
+  /* Show the button when the user scrolls down */
+  body.scrollable {
+    margin-bottom: 50px; /* Add margin at the bottom for button visibility */
+  }
+  
+  body.scrollable .scroll-to-top-button {
+    display: block; /* Show the button when scrolled down */
+  }
+  
+  /* Footer text styles */
+  .footer-text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Footer links styles */
+  .footer-links {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-links li {
+    margin-bottom: 10px;
+  }
+  
+  .footer-links a {
+    color: #ffffff; /* Text color for links */
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .footer-links a:hover {
+    color: #ffdb58; /* GoFood's secondary color on hover */
+  }
+  
+  /* Footer bottom styles */
+  .footer-bottom {
+    background-color: #ff5a5f; /* GoFood's primary color for bottom section */
+    padding: 10px 0;
+    text-align: center;
+  }
+  
+  /* Copyright text styles */
+  .footer-bottom p {
+    font-size: 14px;
+    margin: 0;
+    color: #ffffff; /* Text color for copyright */
+  }
+  

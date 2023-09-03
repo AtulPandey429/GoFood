@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Badge from "@material-ui/core/Badge";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
-import "../index.css";
+import "./navbar.css";
 import Modal from "../screens/Modal";
 import Cart from "../screens/Cart";
 import { useCart } from "./ContextReducer";
@@ -21,13 +21,10 @@ const Navbar = () => {
   const items = useCart();
   return (
     <div>
-      <nav className="navbar navbar-expand-lg text-danger fs-3 bg-success">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light zomato-navbar">
         <div className="container-fluid">
           <div className="d-flex align-items-center">
-            <Link
-              className="navbar-brand fs-3 text-white font-weight-bold"
-              to="/"
-            >
+            <Link className="navbar-brand zomato-logo" to="/">
               GoFood
             </Link>
           </div>
@@ -51,7 +48,7 @@ const Navbar = () => {
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link
-                  className="nav-link active text-white fs-5"
+                  className="nav-link active zomato-link"
                   aria-current="page"
                   to="/"
                 >
@@ -61,7 +58,7 @@ const Navbar = () => {
               {localStorage.getItem("authToken") ? (
                 <li className="nav-item">
                   <Link
-                    className="nav-link active text-white fs-5"
+                    className="nav-link active zomato-link"
                     aria-current="page"
                     to="/myOrder"
                   >

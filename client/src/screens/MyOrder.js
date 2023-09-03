@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./../components/Navbar";
 import Footer from "./../components/Footer";
+// import "./MyOrderList.css"
 
 const MyOrder = () => {
   const [orderData, setorderData] = useState({});
@@ -37,59 +38,49 @@ const MyOrder = () => {
         <Navbar />
       </div>
       <div className="container">
-        <div className="row">
-          {orderData !== {}
-            ? Array(orderData).map((data) => {
-                return data.orderData
-                  ? data.orderData.order_data
-                      .slice(0)
-                      .reverse()
-                      .map((item) => {
-                        return item.map((arrayData) => {
-                          return (
-                            <div className=" item-container">
-                              {arrayData.Order_date ? (
-                                <div className=" order-info ">
-                                  <div className="order-date col-12">
-                                    {arrayData.Order_date}
-                                  </div>
-                                  <hr className="divider" />
-                                </div>
-                              ) : (
-                                <div className=" item-card">
-                                  <img
-                                    src={arrayData.img}
-                                    className="item-image"
-                                    alt="Item"
-                                  />
-                                  <div className="item-details">
-                                    <h5 className="item-name">
-                                      {arrayData.name}
-                                    </h5>
-                                    <hr className="divider" />
-                                    <div className="item-meta">
-                                      <span className="item-quantity">
-                                        {arrayData.qty}
-                                      </span>
-                                      <span className="item-size">
-                                        {arrayData.size}
-                                      </span>
-                                      <div className="item-price">
-                                        ₹{arrayData.price}/-
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        });
-                      })
-                  : "";
-              })
-            : ""}
-        </div>
+  {orderData &&
+    orderData.orderData &&
+    orderData.orderData.order_data.map((dayData, index) => (
+      <div key={index} className="row">
+        {dayData[0].Order_date && (
+          <div className="order-info col-12">
+            <div className="order-date text-white m-2">
+              {dayData[0].Order_date}
+            </div>
+            <hr className="divider" />
+          </div>
+        )}
+        {dayData.map((arrayData, innerIndex) => (
+          <div key={innerIndex} className="col-3">
+            {!arrayData.Order_date && (
+              <div className="item-container">
+                <div className="item-card">
+                  <img
+                    src={arrayData.img}
+                    className="item-image"
+                    alt="Item"
+                  />
+                  <div className="item-details">
+                    <h5 className="item-name">{arrayData.name}</h5>
+                    <hr className="divider" />
+                    <div className="item-meta">
+                      <span className="item-quantity">{arrayData.qty}</span>
+                      <span className="item-size">{arrayData.size}</span>
+                      <div className="item-price">
+                        ₹{arrayData.price}/-
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
+    ))}
+</div>
+
+
       <div>
         <Footer />
       </div>

@@ -126,8 +126,8 @@ const Home = () => {
         {foodCategory.length !== 0
           ? foodCategory.map((ele) => (
               <div key={ele._id} className="row  ">
-                <div className="fs-3 m-2 ">{ele.CategoryName}</div>
-                <hr className="" />
+                <div className="fs-3 m-2 text-white ">{ele.CategoryName}</div>
+                <hr className="text-white" />
 
                 {foodItem.length !== 0
                   ? foodItem

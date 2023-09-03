@@ -19,17 +19,20 @@ export default function Cart() {
     let userEmail = localStorage.getItem("userEmail");
 
     try {
-      let response = await fetch("https://gofood-ezlb.onrender.com/api/user/orderData", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          order_data: data,
-          email: userEmail,
-          order_date: new Date().toDateString(),
-        }),
-      });
+      let response = await fetch(
+        "https://gofood-ezlb.onrender.com/api/user/orderData",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_data: data,
+            email: userEmail,
+            order_date: new Date().toDateString(),
+          }),
+        }
+      );
 
       console.log("Response Status:", response.status);
 
@@ -54,8 +57,8 @@ export default function Cart() {
           </div>
         </div>
       ) : (
-        <div className="container m-auto mt-5 table-responsive  table-responsive-sm table-responsive-md">
-          <table className="table table-hover ">
+        <div className="container m-auto mt-5 table-responsive">
+          <table className="table table-hover">
             <thead className=" text-success fs-4">
               <tr>
                 <th scope="col">#</th>
@@ -63,7 +66,7 @@ export default function Cart() {
                 <th scope="col">Quantity</th>
                 <th scope="col">Option</th>
                 <th scope="col">Amount</th>
-                {/* <th scope="col"></th> */}
+                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>

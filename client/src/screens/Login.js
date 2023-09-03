@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
-
+import "./Login.css";
 const Login = () => {
   const [credential, setCredential] = useState({
     email: "",
@@ -50,52 +50,50 @@ const Login = () => {
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card">
-            <div className="card-header bg-primary text-white">Login</div>
+          <div className="card apple-login-card">
+            {" "}
+            {/* Apply custom CSS class */}
+            <div className="card-header apple-login-header">
+              {" "}
+              {/* Apply custom CSS class */}
+              <h2>Login</h2>
+            </div>
             <div className="card-body">
               {error && <div className="alert alert-danger">{error}</div>}{" "}
               {/* Display error message */}
               <form onSubmit={handleSubmit}>
-                <div className="mb-3 row">
-                  <label htmlFor="email" className="col-sm-4 col-form-label">
-                    Email
-                  </label>
-                  <div className="col-sm-8">
-                    <input
-                      onChange={getValue}
-                      type="email"
-                      className="form-control"
-                      id="email"
-                      name="email"
-                      value={credential.email}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="mb-3 row">
-                  <label htmlFor="password" className="col-sm-4 col-form-label">
-                    Password
-                  </label>
-                  <div className="col-sm-8">
-                    <input
-                      onChange={getValue}
-                      type="password"
-                      className="form-control"
-                      id="password"
-                      name="password"
-                      value={credential.password}
-                      required
-                    />
-                  </div>
+                <div className="mb-3">
+                  <input
+                    onChange={getValue}
+                    type="email"
+                    className="form-control apple-input"
+                    placeholder="Email"
+                    name="email"
+                    value={credential.email}
+                    required
+                  />
                 </div>
                 <div className="mb-3">
-                  <button type="submit" className="btn btn-primary ">
+                  <input
+                    onChange={getValue}
+                    type="password"
+                    className="form-control apple-input"
+                    placeholder="Password"
+                    name="password"
+                    value={credential.password}
+                    required
+                  />
+                </div>
+                <div className="mb-3 text-center">
+                  <button type="submit" className="btn apple-login-button">
                     Login
                   </button>
-                  <Link className=" m-3 btn btn-danger" to="/signup">
+                </div>
+                <p className="text-center">
+                  <Link to="/signup" className="apple-signup-link">
                     I am a new user
                   </Link>
-                </div>
+                </p>
               </form>
             </div>
           </div>
