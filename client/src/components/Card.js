@@ -2,13 +2,16 @@ import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRupeeSign } from "@fortawesome/free-solid-svg-icons";
 import { useDispatchCart, useCart } from "./ContextReducer";
-import "../card.css"
+import { useNavigate } from "react-router-dom";
+import "./zomato-card.css"; // Create a separate CSS file for Zomato-style card styling
+
 const Card = (props) => {
   const option = props.option;
   const priceOption = Object.keys(option);
 
   const data = useCart();
   const dispatch = useDispatchCart();
+  const navigate = useNavigate();
 
   const priceRef = useRef();
   const [qty, setQty] = useState(1);
@@ -16,12 +19,16 @@ const Card = (props) => {
   const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = async () => {
+    if (!localStorage.getItem("authToken")) {
+      navigate("/login");
+      return;
+    }
+
     let existingItem = data.find(
       (item) => item.id === props.foodItem._id && item.size === size
     );
 
     if (existingItem) {
-      // Update existing item in the cart
       await dispatch({
         type: "UPDATE",
         id: props.foodItem._id,
@@ -31,10 +38,9 @@ const Card = (props) => {
       });
       setIsAdded(true);
       setTimeout(() => {
-        setIsAdded(false); // Reset button text to "Added to cart"
+        setIsAdded(false);
       }, 2000);
     } else {
-      // Add new item to the cart
       await dispatch({
         type: "ADD",
         id: props.foodItem._id,
@@ -52,21 +58,24 @@ const Card = (props) => {
   useEffect(() => setSize(priceRef.current.value), []);
 
   return (
-    <div className="card-container">
-      <div className="card">
-        <img
-          src={props.foodItem.img}
-          className="card-img-top card-image"
-          alt="..."
-          
-        />
+    <div className="zomato-card-container">
+      <div className="zomato-card">
+        <div className="zomato-card-img-container">
+          <img
+            src={props.foodItem.img}
+            className="zomato-card-img-top zomato-card-image"
+            alt="..."
+          />
+        </div>
 
-        <div className="card-body card-details">
-          <h5 className="card-title card-name">{props.foodItem.name}</h5>
+        <div className="zomato-card-body zomato-card-details">
+          <h5 className="zomato-card-title zomato-card-name">
+            {props.foodItem.name}
+          </h5>
 
-          <div className="card-options">
+          <div className="zomato-card-options">
             <select
-              className="card-quantity"
+              className="zomato-card-quantity"
               onChange={(e) => setQty(e.target.value)}
             >
               {Array.from(Array(6), (el, i) => (
@@ -77,25 +86,25 @@ const Card = (props) => {
             </select>
 
             <select
-              className="card-size"
+              className="zomato-card-size"
               ref={priceRef}
               onChange={(e) => setSize(e.target.value)}
             >
               {priceOption.map((data) => (
-                <option className="card-option" key={data} value={data}>
+                <option className="zomato-card-option" key={data} value={data}>
                   {data}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="card-price-button">
-            <p className="card-price">
+          <div className="zomato-card-price-button">
+            <p className="zomato-card-price">
               Price: <FontAwesomeIcon icon={faRupeeSign} /> {finalPrice}
             </p>
             <div
-              className={`card-button btn btn-danger ${
-                isAdded ? "added-button" : "add-button"
+              className={`zomato-card-button btn btn-danger ${
+                isAdded ? "zomato-added-button" : "zomato-add-button"
               }`}
               onClick={handleAddToCart}
             >

@@ -1,28 +1,53 @@
-/* Navbar styles */
-.zomato-navbar {
-    background-color: #ca0e14; /* Zomato's primary color */
-    padding: 10px 0;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+.navbar-light {
+  background: #7c7216; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    #c28aea,
+    #45df82
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #ddd2d2,
+    #6e82e4
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+/* Add this CSS to your styles */
+
+/* Add this CSS to your styles */
+
+.navbar-brand {
+  background-image: linear-gradient(
+    45deg,
+    #e2db23,
+    #e884e8,
+    #25dddd,
+    #d62060
+  ); /* Define a gradient background */
+  background-clip: text; /* Apply the text as a mask for the gradient background */
+  -webkit-background-clip: text; /* For webkit browsers */
+  color: transparent; /* Make the text transparent to show the gradient */
+  transition: transform 0.3s, text-shadow 0.3s;
+}
+
+.navbar-brand:hover {
+  transform: translateY(-5px); /* Move text up on hover */
+  text-shadow: 0 5px 5px rgba(221, 218, 23, 0.3); /* Add word shadow below */
+  background-image: linear-gradient(
+    45deg,
+    #ff5733,
+    #ff33ff,
+    #33ff57,
+    #5733ff
+  ); /* Define the same gradient */
+  color: transparent; /* Make the text transparent to show the gradient */
+  animation: rainbow 2s linear infinite; /* Apply a rainbow animation */
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
   }
-  
-  /* Zomato logo styles */
-  .zomato-logo {
-    color: #ffffff; /* White text color */
-    font-size: 24px;
-    font-weight: bold;
-    text-decoration: none;
+  100% {
+    background-position: 100% 50%;
   }
-  
-  /* Zomato link styles */
-  .zomato-link {
-    color: #ffffff; /* White text color */
-    font-size: 18px;
-    text-decoration: none;
-    margin-right: 20px;
-    transition: color 0.2s ease-in-out;
-  }
-  
-  .zomato-link:hover {
-    color: #ffdb58; /* Zomato's secondary color on hover */
-  }
-  
+}

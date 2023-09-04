@@ -8,26 +8,25 @@ import Cart from "../screens/Cart";
 import { useCart } from "./ContextReducer";
 
 const Navbar = () => {
-  const [cartView, setcartView] = useState(false);
+  const [cartView, setCartView] = useState(false);
   const navigate = useNavigate();
   const handleClick = () => {
     localStorage.removeItem("authToken");
     navigate("/");
   };
   const loadCart = () => {
-    setcartView(true);
+    setCartView(true);
   };
 
   const items = useCart();
+
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light zomato-navbar">
+      <nav className="navbar navbar-expand-lg navbar-light">
         <div className="container-fluid">
-          <div className="d-flex align-items-center">
-            <Link className="navbar-brand zomato-logo" to="/">
-              GoFood
-            </Link>
-          </div>
+          <Link className="navbar-brand " to="/">
+            <strong>GoFood</strong>
+          </Link>
 
           <button
             className="navbar-toggler"
@@ -42,45 +41,35 @@ const Navbar = () => {
           </button>
 
           <div
-            className="collapse navbar-collapse justify-content-between"
+            className="collapse navbar-collapse justify-content-end"
             id="navbarNav"
           >
             <ul className="navbar-nav">
               <li className="nav-item">
-                <Link
-                  className="nav-link active zomato-link"
-                  aria-current="page"
-                  to="/"
-                >
+                <Link className="nav-link text-black" to="/">
                   Home
                 </Link>
               </li>
               {localStorage.getItem("authToken") ? (
                 <li className="nav-item">
-                  <Link
-                    className="nav-link active zomato-link"
-                    aria-current="page"
-                    to="/myOrder"
-                  >
+                  <Link className="nav-link text-dark" to="/myOrder">
                     My Order
                   </Link>
                 </li>
-              ) : (
-                ""
-              )}
+              ) : null}
             </ul>
 
             {!localStorage.getItem("authToken") ? (
-              <ul className="navbar-nav  ">
+              <ul className="navbar-nav">
                 <li className="nav-item">
-                  <button className="btn btn-danger login-button ">
+                  <button className="btn btn-danger">
                     <Link className="nav-link text-white" to="/login">
                       Login
                     </Link>
                   </button>
                 </li>
                 <li className="nav-item">
-                  <button className="btn btn-success login-button ">
+                  <button className="btn btn-success">
                     <Link className="nav-link text-white" to="/signup">
                       SignUp
                     </Link>
@@ -89,30 +78,17 @@ const Navbar = () => {
               </ul>
             ) : (
               <ul className="navbar-nav">
-                <li className="nav-item">
-                  <button
-                    className="btn btn-danger login-button "
-                    onClick={loadCart}
-                  >
+                <li className="nav-item m-2">
+                  <button className="btn btn-danger" onClick={loadCart}>
                     <Badge color="secondary" badgeContent={items.length}>
                       <ShoppingCartIcon />
                     </Badge>
                     Cart
                   </button>
                 </li>
-                {cartView ? (
-                  <Modal
-                    onClose={() => {
-                      setcartView(false);
-                    }}
-                  >
-                    {" "}
-                    <Cart />
-                  </Modal>
-                ) : null}
-                <li className="nav-item">
+                <li className="nav-item m-2">
                   <button
-                    className="btn btn-info login-button "
+                    className="btn btn-primary text-white"
                     onClick={handleClick}
                   >
                     LogOut
@@ -123,6 +99,16 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+
+      {cartView && (
+        <Modal
+          onClose={() => {
+            setCartView(false);
+          }}
+        >
+          <Cart />
+        </Modal>
+      )}
     </div>
   );
 };

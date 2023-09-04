@@ -1,0 +1,66 @@
+/* zomato-card.css */
+
+.zomato-card-container {
+  margin-bottom: 20px;
+}
+
+.zomato-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* zomato-card.css */
+
+.zomato-card-img-container {
+    max-height: 200px; /* Set the maximum height */
+    max-width: 100%; /* Set the maximum width to allow full width */
+    overflow:hidden; /* Hide any overflowing content */
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+
+.zomato-card-img-top {
+  object-fit: contain; /* Change to 'none' for full image without cropping or resizing */
+  width: 100%; /* Ensure the image fills the container width */
+  height: 100%; /* Ensure the image fills the container height */
+}
+
+.zomato-card-details {
+  padding: 16px;
+}
+
+.zomato-card-name {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.zomato-card-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.zomato-card-price-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.zomato-card-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.zomato-card-button:hover {
+  background-color: #e74c3c; /* Zomato's primary color */
+  color: #ffffff;
+}
+
+.zomato-added-button {
+  background-color: #27ae60; /* Zomato's secondary color */
+}
