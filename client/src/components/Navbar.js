@@ -9,6 +9,7 @@ import { useCart } from "./ContextReducer";
 
 const Navbar = () => {
   const [cartView, setCartView] = useState(false);
+  const [isNavCollapsed, setIsNavCollapsed] = useState(true); // Add state to track collapsed status
   const navigate = useNavigate();
   const handleClick = () => {
     localStorage.removeItem("authToken");
@@ -20,6 +21,11 @@ const Navbar = () => {
 
   const items = useCart();
 
+  // Function to toggle the navigation menu
+  const handleNavCollapse = () => {
+    setIsNavCollapsed(!isNavCollapsed);
+  };
+
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-light">
@@ -28,20 +34,22 @@ const Navbar = () => {
             <strong>GoFood</strong>
           </Link>
 
+          {/* Add "collapsed" class to collapse button based on isNavCollapsed state */}
           <button
-            className="navbar-toggler"
+            className={`navbar-toggler ${isNavCollapsed ? "collapsed" : ""}`}
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
             aria-controls="navbarNav"
-            aria-expanded="false"
+            aria-expanded={!isNavCollapsed}
             aria-label="Toggle navigation"
+            onClick={handleNavCollapse}
           >
             <span className="navbar-toggler-icon"></span>
           </button>
 
           <div
-            className="collapse navbar-collapse justify-content-end"
+            className={`collapse navbar-collapse justify-content-end ${
+              isNavCollapsed ? "" : "show" // Show or hide based on isNavCollapsed state
+            }`}
             id="navbarNav"
           >
             <ul className="navbar-nav">
