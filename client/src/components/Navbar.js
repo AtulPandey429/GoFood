@@ -30,7 +30,7 @@ const Navbar = () => {
     <div>
       <nav className="navbar navbar-expand-lg navbar-light">
         <div className="container-fluid">
-          <Link className="navbar-brand " to="/">
+          <Link className="navbar-brand text-danger" to="/">
             <strong>GoFood</strong>
           </Link>
 
@@ -70,14 +70,14 @@ const Navbar = () => {
             {!localStorage.getItem("authToken") ? (
               <ul className="navbar-nav">
                 <li className="nav-item">
-                  <button className="btn btn-danger">
+                  <button className="btn btn-danger my-1">
                     <Link className="nav-link text-white" to="/login">
                       Login
                     </Link>
                   </button>
                 </li>
                 <li className="nav-item">
-                  <button className="btn btn-success">
+                  <button className="btn btn-success my-1">
                     <Link className="nav-link text-white" to="/signup">
                       SignUp
                     </Link>
