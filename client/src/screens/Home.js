@@ -163,7 +163,7 @@ const Home = () => {
           : ""}
       </div>
 
-      <div className="container">
+      <div className="fluid">
         <Footer />
       </div>
     </div>
