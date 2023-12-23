@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Delete from "@material-ui/icons/Delete";
+import { RiDeleteBinLine } from "react-icons/ri";
 import { useCart, useDispatchCart } from "../components/ContextReducer";
+import { Scrollbars } from "react-custom-scrollbars";
 
 export default function Cart() {
   const [deleteIndex, setDeleteIndex] = useState(null);
@@ -57,39 +59,41 @@ export default function Cart() {
           </div>
         </div>
       ) : (
-        <div className="container m-auto mt-5 table-responsive">
-          <table className="table table-hover">
-            <thead className=" text-success fs-4">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Option</th>
-                <th scope="col">Amount</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((food, index) => (
-                <tr key={index}>
-                  <th scope="row">{index + 1}</th>
-                  <td>{food.name}</td>
-                  <td>{food.qty}</td>
-                  <td>{food.size}</td>
-                  <td>{food.price}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn p-0"
-                      onClick={() => handleRemove(index)}
-                    >
-                      <Delete />
-                    </button>
-                  </td>
+        <div className="container m-auto mt-5">
+          <Scrollbars style={{ height: "350px", }}>
+            <table className="table table-hover">
+              <thead className="text-success fs-4">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Option</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.map((food, index) => (
+                  <tr key={index}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{food.name}</td>
+                    <td>{food.qty}</td>
+                    <td>{food.size}</td>
+                    <td>{food.price}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn p-0"
+                        onClick={() => handleRemove(index)}
+                      >
+                        <RiDeleteBinLine />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Scrollbars>
           <div>
             <h1 className="fs-2 text-white">Total Price: {totalPrice}/-</h1>
           </div>
