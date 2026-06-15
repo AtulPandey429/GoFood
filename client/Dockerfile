@@ -7,7 +7,6 @@ COPY package.json package-lock.json .npmrc ./
 RUN npm ci --legacy-peer-deps
 
 COPY index.html vite.config.js postcss.config.js tailwind.config.js ./
-COPY public ./public
 COPY src ./src
 
 # Same-origin API — nginx proxies /api to backend

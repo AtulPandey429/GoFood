@@ -7,7 +7,6 @@ COPY client/package.json client/package-lock.json client/.npmrc ./
 RUN npm ci --legacy-peer-deps
 
 COPY client/index.html client/vite.config.js client/postcss.config.js client/tailwind.config.js ./
-COPY client/public ./public
 COPY client/src ./src
 
 ENV VITE_API_URL=
