@@ -1,0 +1,33 @@
+# Render Blueprint — optional one-click deploy
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: gofood
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SANDBOX_MODE
+        value: false
+      - key: CRYPTO_NETWORK
+        value: testnet
+      - key: URL
+        sync: false
+      - key: ACCESS_TOKEN_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: MERCHANT_XRP_ADDRESS
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_USERNAME
+        sync: false
+      - key: TELEGRAM_LOGIN_DOMAIN
+        sync: false

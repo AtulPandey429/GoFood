@@ -12,6 +12,7 @@
     "docker:down": "docker compose down",
     "docker:test": "docker compose --profile test run --rm test",
     "start": "node app.js",
+    "build": "npm install --prefix client --legacy-peer-deps && npm run build --prefix client",
     "server": "nodemon app.js",
     "client": "npm run dev --prefix ./client",
     "dev": "concurrently \"npm run server\" \"npm run client\""
