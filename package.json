@@ -2,27 +2,38 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:api": "node scripts/smoke-test.js",
+    "test:wallet": "node scripts/test-wallet-auth.js",
+    "test:docker": "node scripts/docker-smoke-test.js",
+    "docker:up": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:test": "docker compose --profile test run --rm test",
     "start": "node app.js",
     "server": "nodemon app.js",
-    "client": "npm start --prefix ./client ",
-    "dev": "concurrently \"npm start\" \"npm run client \""
+    "client": "npm run dev --prefix ./client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@stellar/stellar-base": "^15.0.0",
     "bcrypt": "^5.1.1",
+    "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "express-rate-limit": "^7.4.1",
     "express-validator": "^7.0.1",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.1",
     "morgan": "^1.10.0",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "ripple-keypairs": "^1.3.1",
+    "uuid": "^10.0.0"
   }
 }

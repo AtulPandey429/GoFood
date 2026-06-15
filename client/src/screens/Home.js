@@ -1,171 +1,84 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Card from "./../components/Card";
-import "../index.css";
+import Card from "../components/Card";
+import ApiClient from "../factories/api/ApiClient";
 
 const Home = () => {
   const [search, setSearch] = useState("");
   const [foodItem, setFoodItem] = useState([]);
   const [foodCategory, setFoodCategory] = useState([]);
-
-  const loadData = async () => {
-    try {
-      const response = await fetch("https://gofood-ezlb.onrender.com/api/user/fooditems", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Request failed with status: " + response.status);
-      }
-
-      const data = await response.json();
-      setFoodItem(data[0]);
-      setFoodCategory(data[1]);
-
-      // Update state here
-    } catch (error) {
-      console.error("Error loading data:", error);
-    }
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
+    ApiClient.post("/api/display/fooditems", {})
+      .then((data) => {
+        setFoodItem(data[0] || []);
+        setFoodCategory(data[1] || []);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <div>
-      <div>
-        <Navbar />
-      </div>
-      <div className="car-container">
-        <div
-          id="carouselExampleControls"
-          className="carousel slide"
-          data-bs-ride="carousel"
-        >
-          <div
-            className="carousel-inner m-auto "
-            style={{ maxHeight: "400px" }}
-          >
-            <div className="carousel-caption" style={{ zIndex: 1 }}>
-              <div class="d-flex justify-content-center">
-                <input
-                  class="form-control me-2 p-2 "
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-            <div className="carousel-item active">
-            <img src="https://source.unsplash.com/random/900x700/?burger" className="d-block w-100  " style={{ filter: "brightness(30%)" }} alt="..." />
-            </div>
-            <div className="carousel-item">
-              <img
-                src="https://media.istockphoto.com/id/1398630614/photo/bacon-cheeseburger-on-a-toasted-bun.jpg?s=1024x1024&w=is&k=20&c=rXM2ry9bme764bKBGagwq4jYdjr7q98UiJLyHrl6BUU="
-                className="d-block w-100"
-                style={{
-                  filter: "brightness(30%)",
-                  width: "100%",
-                  objectFit: "fill",
-                  objectPosition: "center",
-                }}
-                alt="..."
-              />
-            </div>
-            <div className="carousel-item">
-              <img
-                src="https://media.istockphoto.com/id/1403973419/photo/table-top-of-food-spread-on-table.jpg?s=1024x1024&w=is&k=20&c=MUzQiekBfW_aJnHk-Q0oGwyJyz6K1XUwq-_UZCf1tMM="
-                className="d-block w-100"
-                style={{
-                  filter: "brightness(30%)",
-                  width: "100%",
-                  objectFit: "fill",
-                  objectPosition: "center",
-                }}
-                alt="..."
-              />
-            </div>
+    <div className="min-h-screen bg-slate-950">
+      <Navbar />
+
+      {/* Hero */}
+      <section className="relative h-72 md:h-96 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200"
+          alt="Food banner"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/50 to-slate-950" />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+            Order food with <span className="text-red-500">GoFood</span>
+          </h1>
+          <p className="text-slate-300 mb-6 max-w-md">
+            Pay with cash or crypto · Live XRP prices
+          </p>
+          <div className="w-full max-w-md">
+            <input
+              type="search"
+              placeholder="Search dishes..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="input-field text-center"
+            />
           </div>
-          <button
-            className="carousel-control-prev"
-            type="button"
-            data-bs-target="#carouselExampleControls"
-            data-bs-slide="prev"
-          >
-            <span
-              className="carousel-control-prev-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Previous</span>
-          </button>
-          <button
-            className="carousel-control-next"
-            type="button"
-            data-bs-target="#carouselExampleControls"
-            data-bs-slide="next"
-          >
-            <span
-              className="carousel-control-next-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Next</span>
-          </button>
         </div>
-      </div>
+      </section>
 
-      <div className="container">
-        {foodCategory.length !== 0
-          ? foodCategory.map((ele) => (
-              <div key={ele._id} className="row  ">
-                <div className="fs-3 m-2 text-white ">{ele.CategoryName}</div>
-                <hr className="text-white" />
+      {/* Menu */}
+      <main className="max-w-7xl mx-auto px-4 py-10">
+        {loading ? (
+          <div className="text-center text-slate-400 py-20">Loading menu...</div>
+        ) : (
+          foodCategory.map((cat, idx) => {
+            const items = foodItem.filter(
+              (item) =>
+                item.CategoryName === cat.CategoryName &&
+                item.name.toLowerCase().includes(search.toLowerCase())
+            );
+            if (items.length === 0) return null;
+            return (
+              <section key={cat._id || cat.CategoryName || idx} className="mb-12">
+                <h2 className="text-2xl font-bold text-white mb-1">{cat.CategoryName}</h2>
+                <div className="h-1 w-16 bg-red-500 rounded mb-6" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {items.map((item, i) => (
+                    <Card key={item._id || item.id || i} foodItem={item} />
+                  ))}
+                </div>
+              </section>
+            );
+          })
+        )}
+      </main>
 
-                {foodItem.length !== 0
-                  ? foodItem
-                      .filter(
-                        (item) =>
-                          item.CategoryName === ele.CategoryName &&
-                          item.name
-                            .toLowerCase()
-                            .includes(search.toLocaleLowerCase())
-                      )
-                      .map((filterItem) => (
-                        <div
-                          key={filterItem._id}
-                          className="
-                  
-                          m-lg-4
-                          m-md-5
-
-                          col-12 col-md-4
-                           col-lg-3 "
-                        >
-                          {/* Replace Card with your actual component */}
-                          <Card
-                            foodItem={filterItem}
-                            option={filterItem.options[0]}
-                            img={filterItem.img}
-                          />
-                        </div>
-                      ))
-                  : ""}
-              </div>
-            ))
-          : ""}
-      </div>
-
-      <div className="fluid">
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 };

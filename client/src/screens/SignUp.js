@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import ApiClient from "../factories/api/ApiClient";
 
 const SignUp = () => {
   const [credential, setCredential] = useState({
@@ -10,67 +10,45 @@ const SignUp = () => {
     password: "",
     geolocation: "",
   });
-  const history = useNavigate(); // Initialize the history object
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     try {
-      const res = await fetch(
-        "https://gofood-ezlb.onrender.com/api/user/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({
-            name: credential.name,
-            email: credential.email,
-            password: credential.password,
-            location: credential.geolocation,
-          }),
-        }
-      );
-
-      if (res.status === 200) {
-        // Successful signup, navigate to the home page
-        history("/login"); // Change "/" to the actual route of your home page
-      } else {
-        const json = await res.json();
-        console.error("Error signing up:", json);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      await ApiClient.post("/api/auth/signup", {
+        name: credential.name,
+        email: credential.email,
+        password: credential.password,
+        location: credential.geolocation,
+      });
+      navigate("/login");
+    } catch (err) {
+      setError(err.message || "Signup failed");
     }
   };
+
   const getCurrentLocation = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          const apiKey = "182cdc8c47cd4da7864864003692fd01"; // Replace with your actual OpenCage API key
-
+          const { latitude, longitude } = position.coords;
+          const apiKey = "182cdc8c47cd4da7864864003692fd01";
           try {
             const response = await axios.get(
               `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`
             );
-
             if (response.status === 200 && response.data.results.length > 0) {
               const location = response.data.results[0].formatted;
-
-              // Update the state with the retrieved location
               setCredential({ ...credential, geolocation: location });
             }
-          } catch (error) {
-            console.error("Error fetching location data:", error);
+          } catch (err) {
+            console.error("Error fetching location data:", err);
           }
         },
-        (error) => {
-          console.error("Error getting location:", error);
-        }
+        (err) => console.error("Error getting location:", err)
       );
-    } else {
-      console.error("Geolocation is not available in this browser.");
     }
   };
 
@@ -79,83 +57,81 @@ const SignUp = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card swiggy-signup-card"> {/* Apply custom CSS class */}
-            <div className="card-header swiggy-signup-header"> {/* Apply custom CSS class */}
-              <h2>Signup</h2>
-            </div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <input
-                    onChange={getValue}
-                    type="text"
-                    className="form-control"
-                    placeholder="Username"
-                    name="name"
-                    value={credential.name}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    onChange={getValue}
-                    type="email"
-                    className="form-control"
-                    placeholder="Email"
-                    name="email"
-                    value={credential.email}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    onChange={getValue}
-                    type="password"
-                    className="form-control"
-                    placeholder="Password"
-                    name="password"
-                    value={credential.password}
-                    required
-                  />
-                </div>
-                <div className="mb-3 input-group">
-                  <input
-                    onChange={getValue}
-                    type="text"
-                    className="form-control"
-                    placeholder="Location"
-                    name="geolocation"
-                    value={credential.geolocation}
-                    required
-                  />
-                  <button
-                    onClick={getCurrentLocation}
-                    className="btn btn-secondary"
-                  >
-                    Get Location
-                  </button>
-                </div>
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <Link to="/" className="text-3xl font-bold text-red-500">GoFood</Link>
+          <p className="text-slate-400 mt-2">Create your account</p>
+        </div>
 
-                <div className="mb-3 text-center">
-                  <button type="submit" className="btn swiggy-signup-button"> {/* Apply custom CSS class */}
-                    Signup
-                  </button>
-                </div>
-                <p className="text-center">
-                  Already a user?{" "}
-                  <Link to="/login" className="btn btn-danger">
-                    Login
-                  </Link>
-                </p>
-              </form>
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          {error && (
+            <div className="mb-4 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+              {error}
             </div>
-          </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              onChange={getValue}
+              type="text"
+              className="input-field"
+              placeholder="Username"
+              name="name"
+              value={credential.name}
+              required
+            />
+            <input
+              onChange={getValue}
+              type="email"
+              className="input-field"
+              placeholder="Email"
+              name="email"
+              value={credential.email}
+              required
+            />
+            <input
+              onChange={getValue}
+              type="password"
+              className="input-field"
+              placeholder="Password"
+              name="password"
+              value={credential.password}
+              required
+            />
+            <div className="flex gap-2">
+              <input
+                onChange={getValue}
+                type="text"
+                className="input-field flex-1"
+                placeholder="Location"
+                name="geolocation"
+                value={credential.geolocation}
+                required
+              />
+              <button
+                type="button"
+                onClick={getCurrentLocation}
+                className="btn-secondary whitespace-nowrap text-sm"
+              >
+                Locate
+              </button>
+            </div>
+            <button type="submit" className="btn-primary w-full py-3">
+              Sign up
+            </button>
+          </form>
+
+          <p className="text-center mt-6 text-sm text-slate-400">
+            Already have an account?{" "}
+            <Link to="/login" className="text-red-400 hover:text-red-300 font-medium">
+              Login
+            </Link>
+          </p>
         </div>
       </div>
     </div>
   );
 };
+
 export default SignUp;

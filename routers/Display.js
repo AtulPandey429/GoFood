@@ -1,10 +1,11 @@
 const express = require("express");
-const Routes = express.Router();
-Routes.post("/fooditems", async (req, res) => {
-  try {
-    res.send([global.food_items, global.foodCategory]);
-  } catch (error) {
-    res.send(error);
-  }
+const router = express.Router();
+const FoodRepository = require("../repositories/FoodRepository");
+const { normalizeFoodItems } = require("../utils/normalizeFoodOptions");
+
+router.post("/fooditems", async (req, res) => {
+  const data = FoodRepository.getAll();
+  res.json([normalizeFoodItems(data.items), data.categories]);
 });
-module.exports = Routes;
+
+module.exports = router;

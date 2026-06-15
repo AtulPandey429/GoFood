@@ -1,58 +1,57 @@
 import React from "react";
-import { Link } from "react-router-dom"; // Import Link component
-import "./Footer.css"; // Import your custom CSS for styling
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // Smooth scroll behavior
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  return (
-    <footer className="gofood-footer">
-      <div className="container">
-        <div className="row">
-          <div className="col-md-4">
-            <h4 className="footer-heading">About GoFood</h4>
-            <p className="footer-text">
-              GoFood is your go-to destination for delicious and diverse
-              culinary experiences. Explore a wide range of cuisines, from local
-              favorites to international delights, all delivered to your
-              doorstep. Discover the joy of great food with GoFood.
-            </p>
-          </div>
-          <div className="col-md-4">
-            <h4 className="footer-heading">Quick Links</h4>
-            <ul className="footer-links">
-              <li>
-                <Link to="/">Home</Link>
-              </li>
 
-              <li>
-                <Link to="/contact">Contact</Link>
-              </li>
-            </ul>
-          </div>
-          <div className="col-md-4">
-            <h4 className="footer-heading">Contact Us</h4>
-            <p className="footer-text">
-              Email: contact@example.com
-              <br />
-              Phone: +1 (123) 456-7890
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="footer-bottom">
-        <div className="container">
-          <button className="scroll-to-top-button btn btn-success" onClick={scrollToTop}>
-            Back to Top
-          </button>
-          <p className="text-center">
-            &copy; {new Date().getFullYear()} GoFood
+  return (
+    <footer className="bg-slate-900 border-t border-slate-800 mt-16">
+      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h4 className="text-lg font-semibold text-white mb-3">About GoFood</h4>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            GoFood delivers delicious meals to your door. Browse local favorites and
+            international dishes, pay with cash or crypto.
           </p>
         </div>
+        <div>
+          <h4 className="text-lg font-semibold text-white mb-3">Quick Links</h4>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <Link to="/" className="text-slate-400 hover:text-red-400 transition-colors">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/login" className="text-slate-400 hover:text-red-400 transition-colors">
+                Login
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-lg font-semibold text-white mb-3">Contact</h4>
+          <p className="text-slate-400 text-sm">
+            Email: contact@gofood.app
+            <br />
+            Phone: +91 98765 43210
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-800 py-6 relative">
+        <p className="text-center text-slate-500 text-sm">
+          &copy; {new Date().getFullYear()} GoFood. All rights reserved.
+        </p>
+        <button
+          type="button"
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg shadow-emerald-500/30 transition-colors z-40"
+        >
+          Back to Top
+        </button>
       </div>
     </footer>
   );

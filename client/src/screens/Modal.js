@@ -1,43 +1,30 @@
 import React from "react";
 import ReactDom from "react-dom";
 
-const MODAL_STYLES = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  backgroundColor: "rgb(34,34,34)",
-  transform: "translate(-50%, -50%)",
-  zIndex: 1000,
-  height: "90%",
-  width: "90%",
-};
-
-const OVERLAY_STYLES = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, .7)",
-  zIndex: 1000,
-};
-
 export default function Modal({ children, onClose }) {
   return ReactDom.createPortal(
-    <>
-      <div style={OVERLAY_STYLES} />
-      <div style={MODAL_STYLES}>
-        <button
-          className="btn bg-danger fs-4"
-          style={{ marginLeft: "90%", marginTop: "-35px" }}
-          onClick={onClose}
-        >
-          {" "}
-          X{" "}
-        </button>
-        {children}
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+        aria-label="Close cart"
+      />
+      <div className="relative w-full max-w-2xl max-h-[90vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+          <h2 className="text-lg font-semibold text-white">Your Cart</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-red-500 text-slate-300 hover:text-white transition-colors"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="overflow-y-auto flex-1 p-5">{children}</div>
       </div>
-    </>,
+    </div>,
     document.getElementById("cart-root")
   );
 }

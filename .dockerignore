@@ -1,0 +1,15 @@
+node_modules
+client/node_modules
+client/dist
+client/build
+.git
+.gitignore
+.env
+*.md
+plan.md
+.cursor
+terminals
+assets
+**/*.test.js
+client/.env
+client/.env.*
