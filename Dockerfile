@@ -31,7 +31,6 @@ COPY middleware ./middleware
 COPY model ./model
 COPY repositories ./repositories
 COPY routers ./routers
-COPY seeds ./seeds
 COPY services ./services
 COPY utils ./utils
 
