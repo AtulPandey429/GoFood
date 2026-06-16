@@ -13,7 +13,7 @@ const Card = ({ foodItem }) => {
   const data = useCart();
   const dispatch = useDispatchCart();
   const navigate = useNavigate();
-  const { formatDualPrice } = useCrypto();
+  const { toXrp, toXlm, toUsd } = useCrypto();
 
   const [qty, setQty] = useState(1);
   const [sizeKey, setSizeKey] = useState(defaultKey);
@@ -96,7 +96,12 @@ const Card = ({ foodItem }) => {
         </div>
 
         <div className="pt-1">
-          <p className="text-2xl font-bold text-white">{formatDualPrice(finalPrice)}</p>
+          <p className="text-2xl font-bold text-white">₹{finalPrice.toFixed(0)}</p>
+          <div className="mt-1 flex items-baseline flex-wrap gap-x-3 gap-y-1">
+            <span className="text-sm font-semibold text-emerald-300">${toUsd(finalPrice).toFixed(2)}</span>
+            <span className="text-xs text-amber-300">{toXrp(finalPrice).toFixed(4)} XRP</span>
+            <span className="text-xs text-sky-300">{toXlm(finalPrice).toFixed(4)} XLM</span>
+          </div>
           <p className="text-xs text-slate-500 mt-0.5">
             ₹{unitPrice} × {qty} · {selectedLabel}
           </p>

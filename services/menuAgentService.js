@@ -1,5 +1,4 @@
 const env = require("../Config/env");
-const { pickMenuImage } = require("../utils/menuImagePool");
 const { isImageUrlReachable } = require("../utils/validateImageUrl");
 
 const CATEGORIES = ["Pizza", "Burger", "Dessert", "Drinks"];
@@ -11,10 +10,17 @@ The admin describes a dish in plain language. Reply with JSON only:
   "CategoryName": one of Pizza|Burger|Dessert|Drinks,
   "price": number in INR,
   "description": "short appetizing description",
-  "img": "optional — omit unless you are certain the Unsplash URL exists; server assigns a verified image",
+  "img": "optional direct image URL only if you are very confident it exists",
+  "imageReferences": [
+    {
+      "platform": "Unsplash|Pexels|Pixabay|Wikimedia",
+      "searchQuery": "short query",
+      "searchUrl": "platform search page URL"
+    }
+  ],
   "reply": "one line: ready to review this draft (do NOT say it is already saved or added)"
 }
-Prices are in Indian Rupees. Do not invent Unsplash photo IDs — leave img empty if unsure.`;
+Prices are in Indian Rupees. Prefer giving accurate platform search URLs in imageReferences so admin can pick the best image manually.`;
 
 const PROVIDER_IDS = ["gemini", "groq", "openrouter", "cerebras", "openai"];
 const DEFAULT_PROVIDER_ORDER = "gemini,groq,openrouter,cerebras,openai";
@@ -67,6 +73,15 @@ function normalizeItem(raw) {
   if (price <= 0) throw new Error("Could not determine a valid price (INR)");
 
   const description = String(raw.description || `${name} — freshly prepared`).trim();
+  const imageReferences = Array.isArray(raw.imageReferences)
+    ? raw.imageReferences
+        .map((ref) => ({
+          platform: String(ref?.platform || "").trim(),
+          searchQuery: String(ref?.searchQuery || "").trim(),
+          searchUrl: String(ref?.searchUrl || "").trim(),
+        }))
+        .filter((ref) => ref.platform && ref.searchQuery && /^https?:\/\//i.test(ref.searchUrl))
+    : [];
 
   return {
     name,
@@ -76,6 +91,7 @@ function normalizeItem(raw) {
     options: raw.options?.length ? raw.options : defaultOptions(price),
     reply: raw.reply || `Ready to review ${name} at ₹${price}.`,
     proposedImg: String(raw.img || "").trim(),
+    imageReferences,
   };
 }
 
@@ -90,9 +106,9 @@ async function attachMenuImage(item, menuContext) {
     img = proposed;
   } else {
     if (proposed) {
-      imageNote = "Suggested image URL was broken or already used — assigned a verified photo.";
+      imageNote =
+        "Suggested direct image URL was broken or already used. Please pick one from image references.";
     }
-    img = pickMenuImage(item.CategoryName, used);
   }
 
   const { proposedImg, ...rest } = item;
@@ -358,6 +374,7 @@ const menuAgentService = {
       categories: menuContext.categories?.length ? menuContext.categories : CATEGORIES,
       itemNames: menuContext.itemNames || [],
       usedImages: menuContext.usedImages || [],
+      prompt: prompt?.trim() || "",
     };
 
     if (!prompt?.trim()) {

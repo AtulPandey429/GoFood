@@ -1,4 +1,12 @@
 /** Fill missing days so the chart always shows a consistent window. */
+function toLocalDateKey(dateInput) {
+  const d = new Date(dateInput);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export function fillChartDays(data, days = 7) {
   const map = new Map(
     (data || []).map((d) => {
@@ -14,7 +22,7 @@ export function fillChartDays(data, days = 7) {
   for (let i = days - 1; i >= 0; i -= 1) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
+    const key = toLocalDateKey(d);
     result.push({ date: key, revenue: map.get(key) || 0 });
   }
 

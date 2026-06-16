@@ -19,6 +19,19 @@ const statusColors = {
   Delivered: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
 };
 
+function shortOrderRef(orderId) {
+  const raw = String(orderId || "");
+  if (!raw) return "—";
+
+  // Avoid showing raw Mongo ObjectId/UUID directly; generate stable short ref.
+  let hash = 5381;
+  for (let i = 0; i < raw.length; i += 1) {
+    hash = ((hash << 5) + hash) ^ raw.charCodeAt(i);
+  }
+  const code = Math.abs(hash).toString(36).toUpperCase().padStart(6, "0").slice(0, 8);
+  return `ORD-${code}`;
+}
+
 const StatCard = ({ label, value, accent, hint }) => (
   <div className="stat-card">
     <p className="stat-label">{label}</p>
@@ -210,7 +223,7 @@ const AdminDashboard = () => {
                         return (
                           <tr key={o.orderId} className="hover:bg-slate-800/40 transition-colors">
                             <td className="px-5 py-3 font-mono text-xs text-slate-300">
-                              {o.orderId?.slice(0, 8)}…
+                              {shortOrderRef(o.orderId)}
                             </td>
                             <td className="px-5 py-3 text-slate-300 max-w-[200px] truncate font-mono text-xs" title={o.displayIdentity || o.email || o.customerWallet}>
                               {o.displayIdentity || o.email || o.customerWallet || "—"}
@@ -402,6 +415,16 @@ const AdminDashboard = () => {
                 value={newFood.img}
                 onChange={(e) => setNewFood({ ...newFood, img: e.target.value })}
               />
+              {newFood.img && (
+                <img
+                  src={newFood.img}
+                  alt="Food preview"
+                  className="w-full h-28 rounded-lg object-cover border border-slate-700 bg-slate-900"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              )}
             </div>
             <div className="px-6 py-4 border-t border-slate-800 flex justify-end gap-3">
               <button type="button" onClick={() => { setShowFoodModal(false); setEditingFoodId(null); }} className="btn-secondary text-sm">

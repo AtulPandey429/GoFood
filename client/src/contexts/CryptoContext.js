@@ -87,11 +87,16 @@ export const CryptoProvider = ({ children }) => {
 
   const toXrp = (inr) => (prices?.xrp?.inr ? inr / prices.xrp.inr : 0);
   const toXlm = (inr) => (prices?.xlm?.inr ? inr / prices.xlm.inr : 0);
+  const toUsd = (inr) => {
+    if (!prices?.xrp?.inr || !prices?.xrp?.usd) return 0;
+    const usdPerInr = prices.xrp.usd / prices.xrp.inr;
+    return inr * usdPerInr;
+  };
   const formatDualPrice = (inr) => PriceFormatter.formatDual(inr, toXrp(inr));
 
   return (
     <CryptoContext.Provider
-      value={{ prices, priceMeta, loading, error, toXrp, toXlm, formatDualPrice, refreshPrices }}
+      value={{ prices, priceMeta, loading, error, toXrp, toXlm, toUsd, formatDualPrice, refreshPrices }}
     >
       {children}
     </CryptoContext.Provider>

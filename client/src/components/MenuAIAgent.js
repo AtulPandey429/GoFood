@@ -156,6 +156,26 @@ const MenuAIAgent = ({ onApplySuggestion, onItemCreated }) => {
           {suggestion.description && (
             <p className="text-xs text-slate-500 line-clamp-2">{suggestion.description}</p>
           )}
+          {Array.isArray(suggestion.imageReferences) && suggestion.imageReferences.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-[11px] text-slate-400">AI image references (pick from platform)</p>
+              <div className="space-y-1">
+                {suggestion.imageReferences.map((ref, idx) => (
+                  <div key={`${ref.searchUrl}-${idx}`} className="text-[11px] text-slate-300">
+                    <a
+                      href={ref.searchUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sky-400 hover:text-sky-300 underline"
+                    >
+                      {ref.platform}
+                    </a>
+                    <span className="text-slate-500"> · {ref.searchQuery}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex flex-wrap gap-2 pt-1">
             <button
               type="button"
