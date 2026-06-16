@@ -1,10 +1,10 @@
-const { foodCategories, foodItems } = require("../../seeds/foodSeed");
+const FoodRepository = require("../../repositories/FoodRepository");
 
 function seedGlobals() {
-  global.food_items = foodItems;
-  global.foodCategory = foodCategories;
   global.useMemoryDb = true;
-  console.log("[db] Loaded in-memory seed data");
+  return FoodRepository.ensureSeeded().then(() => {
+    console.log("[db] Using in-memory storage (no MongoDB)");
+  });
 }
 
 module.exports = { seedGlobals };

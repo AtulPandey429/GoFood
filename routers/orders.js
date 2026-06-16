@@ -6,5 +6,6 @@ const { validateOrder } = require("../middleware/validation");
 
 router.post("/", authMiddleware, validateOrder, orderController.createOrder);
 router.post("/history", authMiddleware, orderController.getHistory);
+router.get("/:orderId", authMiddleware, orderController.getOrderById);
 
 module.exports = router;

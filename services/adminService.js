@@ -4,69 +4,62 @@ const FoodRepository = require("../repositories/FoodRepository");
 const orderStatusService = require("./orderStatusService");
 const notificationService = require("./notificationService");
 const eventBus = require("./eventBus");
+const presenceService = require("./presenceService");
+const menuAgentService = require("./menuAgentService");
 
 const adminService = {
   async getStats() {
-    const [userCount, orders] = await Promise.all([
+    const [userCount, orderStats, presence] = await Promise.all([
       UserRepository.count(),
-      OrderRepository.flattenOrders(),
+      OrderRepository.aggregateStats(),
+      Promise.resolve(presenceService.getSnapshot()),
     ]);
-
-    let totalRevenueInr = 0;
-    let totalRevenueXrp = 0;
-    let totalRevenueXlm = 0;
-    const dailyRevenue = {};
-
-    orders.forEach((order) => {
-      const items = order.items || [];
-      const dayTotal = items.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0);
-      totalRevenueInr += dayTotal;
-
-      const meta = order.metadata || {};
-      if (meta.cryptoAsset === "XRP") totalRevenueXrp += meta.cryptoAmount || 0;
-      if (meta.cryptoAsset === "XLM") totalRevenueXlm += meta.cryptoAmount || 0;
-
-      const date = meta.Order_date || meta.createdAt?.split("T")[0] || "unknown";
-      dailyRevenue[date] = (dailyRevenue[date] || 0) + dayTotal;
-    });
-
-    const chartData = Object.entries(dailyRevenue)
-      .map(([date, revenue]) => ({ date, revenue }))
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
 
     return {
       totalUsers: userCount,
-      totalOrders: orders.length,
-      totalRevenueInr,
-      totalRevenueXrp,
-      totalRevenueXlm,
-      chartData,
+      onlineUsers: presence.onlineCount,
+      totalOrders: orderStats.totalOrders,
+      totalRevenueInr: orderStats.totalRevenueInr,
+      totalRevenueXrp: orderStats.totalRevenueXrp,
+      totalRevenueXlm: orderStats.totalRevenueXlm,
+      chartData: orderStats.chartData,
     };
   },
 
-  async getOrders() {
-    return OrderRepository.flattenOrders();
+  async getOrders({ limit = 50, skip = 0 } = {}) {
+    const docs = await OrderRepository.findAll({ limit, skip });
+    return docs.map((doc) => OrderRepository.toAdminView(doc));
   },
 
   async updateOrderStatus(orderId, deliveryStatus) {
-    const orders = await OrderRepository.flattenOrders();
-    const order = orders.find((o) => o.orderId === orderId);
-    if (!order) throw new Error("Order not found");
+    const doc = await OrderRepository.findByOrderId(orderId);
+    if (!doc) throw new Error("Order not found");
 
-    orderStatusService.validateTransition(order.metadata.deliveryStatus, deliveryStatus);
+    const currentStatus = doc.delivery?.status || "Placed";
+    orderStatusService.validateTransition(currentStatus, deliveryStatus);
 
-    const updated =     await OrderRepository.updateOrderByOrderId(orderId, {
-      deliveryStatus,
+    await OrderRepository.updateOrderByOrderId(orderId, { deliveryStatus });
+    await OrderRepository.appendTimeline(orderId, {
+      status: deliveryStatus,
+      note: `Status updated to ${deliveryStatus}`,
+      actor: "admin",
     });
 
+    const order = OrderRepository.toAdminView(
+      await OrderRepository.findByOrderId(orderId)
+    );
+
     eventBus.publish("order:update", {
+      userId: order.userId ? String(order.userId) : undefined,
       email: order.email,
       orderId,
       deliveryStatus,
       paymentStatus: order.metadata?.paymentStatus,
     });
 
-    const user = await UserRepository.findByEmail(order.email);
+    const user = order.userId
+      ? await UserRepository.findById(order.userId)
+      : await UserRepository.findByEmail(order.email);
     if (user) {
       const eventMap = {
         Preparing: "status_preparing",
@@ -76,14 +69,15 @@ const adminService = {
       await notificationService.notifyUser(user, eventMap[deliveryStatus] || "status_update", order);
     }
 
-    return updated;
+    return order;
   },
 
   async getUsers() {
-    return UserRepository.findAll();
+    const users = await UserRepository.findAll();
+    return users.map((u) => UserRepository.toSafeUser(u));
   },
 
-  getFoodItems() {
+  async getFoodItems() {
     return FoodRepository.getAll();
   },
 
@@ -97,6 +91,24 @@ const adminService = {
 
   async deleteFoodItem(id) {
     return FoodRepository.deleteItem(id);
+  },
+
+  async suggestMenuItem(prompt) {
+    const { items } = await FoodRepository.getAll();
+    const categories = [...new Set(items.map((i) => i.CategoryName).filter(Boolean))];
+    const itemNames = items.map((i) => i.name);
+    const usedImages = items.map((i) => i.img).filter(Boolean);
+    return menuAgentService.suggestFromPrompt(prompt, { categories, itemNames, usedImages });
+  },
+
+  async createMenuItemFromPrompt(prompt) {
+    const { item } = await this.suggestMenuItem(prompt);
+    const created = await FoodRepository.createItem(item);
+    return { item: created, suggested: item };
+  },
+
+  getMenuAgentStatus() {
+    return menuAgentService.getStatus();
   },
 };
 

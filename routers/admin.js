@@ -14,5 +14,8 @@ router.get("/food-items", adminController.getFoodItems);
 router.post("/food-items", adminController.createFoodItem);
 router.put("/food-items/:id", adminController.updateFoodItem);
 router.delete("/food-items/:id", adminController.deleteFoodItem);
+router.get("/menu-agent/status", adminController.getMenuAgentStatus);
+router.post("/menu-agent/suggest", adminController.suggestMenuItem);
+router.post("/menu-agent/create", adminController.createMenuItemFromPrompt);
 
 module.exports = router;

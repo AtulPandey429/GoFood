@@ -4,10 +4,15 @@ const contactSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  location: Joi.string().required(),
+  location: Joi.string().allow("").optional(),
 });
 
 const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+
+const linkEmailSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
 });
@@ -61,6 +66,8 @@ module.exports = {
   validateContactData: validate(contactSchema),
   validateLoginData: validate(loginSchema),
   validateWalletLogin: validate(walletLoginSchema),
+  validateLinkEmail: validate(linkEmailSchema),
+  validateLinkWallet: validate(walletLoginSchema),
   validateTelegramAuth: validate(telegramAuthSchema),
   validateOrder: validate(orderSchema),
   validateNotifications: validate(notificationSchema),

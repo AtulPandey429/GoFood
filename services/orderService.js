@@ -1,11 +1,13 @@
 const OrderRepository = require("../repositories/OrderRepository");
 const UserRepository = require("../repositories/UserRepository");
+const OrderBuilder = require("../domain/orders/OrderBuilder");
 const PaymentFactory = require("../factories/payment/PaymentFactory");
 const paymentVerificationService = require("./paymentVerificationService");
 const eventBus = require("./eventBus");
 const { validateTxHash } = require("../utils/securityValidators");
 const { PAYMENT_METHODS } = require("../constants/paymentMethods");
 const { PAYMENT_STATUS } = require("../constants/orderStatus");
+const { hasRealEmail } = require("../utils/userIdentity");
 
 let notificationService = null;
 const getNotificationService = () => {
@@ -15,8 +17,32 @@ const getNotificationService = () => {
   return notificationService;
 };
 
+function orderBelongsToUser(doc, user) {
+  if (!doc || !user) return false;
+  const userId = String(user._id || user.id);
+  if (doc.userId && String(doc.userId) === userId) return true;
+  if (hasRealEmail(user) && doc.userEmail === user.email) return true;
+  if (user.walletAddress && doc.customerWallet === user.walletAddress) return true;
+  return false;
+}
+
+function publishOrderUpdate(user, payload) {
+  eventBus.publish("order:update", {
+    userId: String(user._id || user.id),
+    email: hasRealEmail(user) ? user.email : null,
+    ...payload,
+  });
+}
+
 const orderService = {
-  async createOrder(userEmail, body) {
+  async createOrder(userId, body) {
+    const user = await UserRepository.findById(userId);
+    if (!user) {
+      const err = new Error("User not found");
+      err.statusCode = 401;
+      throw err;
+    }
+
     const {
       order_data,
       paymentMethod,
@@ -52,47 +78,39 @@ const orderService = {
 
     const processor = PaymentFactory.create(paymentMeta.paymentMethod, paymentMeta.cryptoAsset);
     const processed = processor.process(paymentMeta);
+    const orderDoc = OrderBuilder.fromCart(order_data, processed, user);
+    const orderId = orderDoc.orderId;
 
-    const batch = OrderRepository.buildOrderBatch(order_data, processed);
-    const orderId = batch[0].orderId;
-
-    const existingDoc = await OrderRepository.findByEmail(userEmail);
-    if (!existingDoc) {
-      await OrderRepository.create(userEmail, batch);
-    } else {
-      await OrderRepository.pushOrder(userEmail, batch);
-    }
+    await OrderRepository.create(orderDoc);
 
     if (paymentMeta.paymentMethod === PAYMENT_METHODS.CRYPTO) {
-      await this._verifyAndUpdatePayment(userEmail, orderId, paymentMeta);
+      await this._verifyAndUpdatePayment(user, orderId, paymentMeta);
     }
 
     try {
-      const user = await UserRepository.findByEmail(userEmail);
-      if (user) {
-        const orders = await OrderRepository.flattenOrders();
-        const fullOrder = orders.find((o) => o.orderId === orderId);
-        await getNotificationService().notifyUser(
-          user,
-          "order_placed",
-          fullOrder || { orderId, metadata: batch[0], items: batch.slice(1) }
-        );
-      }
+      const fullOrder = await OrderRepository.findByOrderId(orderId);
+      await getNotificationService().notifyUser(
+        user,
+        "order_placed",
+        OrderRepository.toNotificationShape(fullOrder)
+      );
     } catch (e) {
       console.warn("[order] Notification failed:", e.message);
     }
 
-    const updated = await OrderRepository.flattenOrders();
-    const placed = updated.find((o) => o.orderId === orderId);
+    const placed = await OrderRepository.findByOrderId(orderId);
+    const summary = OrderRepository.toSummary(placed);
 
-    return {
-      success: true,
+    publishOrderUpdate(user, {
       orderId,
-      paymentStatus: placed?.metadata?.paymentStatus || batch[0].paymentStatus,
-    };
+      deliveryStatus: "Placed",
+      paymentStatus: placed?.payment?.status || "Paid",
+    });
+
+    return { success: true, ...summary };
   },
 
-  async _verifyAndUpdatePayment(userEmail, orderId, paymentMeta) {
+  async _verifyAndUpdatePayment(user, orderId, paymentMeta) {
     const result = await paymentVerificationService.verify({
       txHash: paymentMeta.txHash,
       cryptoAsset: paymentMeta.cryptoAsset,
@@ -111,10 +129,17 @@ const orderService = {
       verificationNote: result.verified ? "" : result.reason || "Pending verification",
     };
 
-    await OrderRepository.updateOrderByOrderId(orderId, updates);
+    await OrderRepository.updateByOrderId(orderId, updates);
 
-    eventBus.publish("order:update", {
-      email: userEmail,
+    if (result.verified) {
+      await OrderRepository.appendTimeline(orderId, {
+        status: "Paid",
+        note: "Payment confirmed on-chain",
+        actor: "system",
+      });
+    }
+
+    publishOrderUpdate(user, {
       orderId,
       paymentStatus: updates.paymentStatus,
       deliveryStatus: "Placed",
@@ -122,11 +147,12 @@ const orderService = {
     });
 
     if (!result.verified && paymentMeta.txHash) {
-      this._schedulePaymentRetry(userEmail, orderId, paymentMeta);
+      this._schedulePaymentRetry(user, orderId, paymentMeta);
     }
   },
 
-  _schedulePaymentRetry(userEmail, orderId, paymentMeta) {
+  _schedulePaymentRetry(user, orderId, paymentMeta) {
+    const userId = String(user._id || user.id);
     setTimeout(async () => {
       try {
         const result = await paymentVerificationService.verify({
@@ -145,22 +171,29 @@ const orderService = {
           paymentStatus: result.paymentStatus,
           verificationNote: "",
         };
-        await OrderRepository.updateOrderByOrderId(orderId, updates);
-
-        eventBus.publish("order:update", {
-          email: userEmail,
-          orderId,
-          paymentStatus: updates.paymentStatus,
-          deliveryStatus: "Placed",
-          verificationNote: "",
+        await OrderRepository.updateByOrderId(orderId, updates);
+        await OrderRepository.appendTimeline(orderId, {
+          status: "Paid",
+          note: "Payment confirmed on-chain (retry)",
+          actor: "system",
         });
 
-        const user = await UserRepository.findByEmail(userEmail);
-        if (user) {
-          const orders = await OrderRepository.flattenOrders();
-          const fullOrder = orders.find((o) => o.orderId === orderId);
+        const freshUser = await UserRepository.findById(userId);
+        if (freshUser) {
+          publishOrderUpdate(freshUser, {
+            orderId,
+            paymentStatus: updates.paymentStatus,
+            deliveryStatus: "Placed",
+            verificationNote: "",
+          });
+
+          const fullOrder = await OrderRepository.findByOrderId(orderId);
           if (fullOrder) {
-            await getNotificationService().notifyUser(user, "payment_confirmed", fullOrder);
+            await getNotificationService().notifyUser(
+              freshUser,
+              "payment_confirmed",
+              OrderRepository.toNotificationShape(fullOrder)
+            );
           }
         }
       } catch (e) {
@@ -169,9 +202,21 @@ const orderService = {
     }, 30000);
   },
 
-  async getOrderHistory(userEmail) {
-    const doc = await OrderRepository.findByEmail(userEmail);
-    return { orderData: doc };
+  async getOrderHistory(userId) {
+    const docs = await OrderRepository.findByUserId(userId);
+    const orders = docs.map((doc) => OrderRepository.toSummary(doc));
+    return { orders };
+  },
+
+  async getOrderById(userId, orderId) {
+    const user = await UserRepository.findById(userId);
+    const doc = await OrderRepository.findByOrderId(orderId);
+    if (!orderBelongsToUser(doc, user)) {
+      const err = new Error("Order not found");
+      err.statusCode = 404;
+      throw err;
+    }
+    return OrderRepository.toSummary(doc);
   },
 };
 

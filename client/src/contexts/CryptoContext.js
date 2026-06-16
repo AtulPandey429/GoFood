@@ -3,21 +3,34 @@ import API_BASE_URL from "../config";
 import PriceFormatter from "../factories/price/PriceFormatter";
 
 const CryptoContext = createContext(null);
+const PRICE_POLL_MS = 10 * 60 * 1000;
 
 function normalizePrices(data) {
   if (!data?.xrp?.inr) return null;
-  return { xrp: data.xrp, xlm: data.xlm || data.xrp };
+  return {
+    xrp: data.xrp,
+    xlm: data.xlm || data.xrp,
+    cachedAt: data.cachedAt,
+    nextUpdateAt: data.nextUpdateAt,
+    ttlMinutes: data.ttlMinutes ?? 10,
+  };
 }
 
 export const CryptoProvider = ({ children }) => {
   const [prices, setPrices] = useState(null);
+  const [priceMeta, setPriceMeta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const applyPrices = useCallback((data) => {
     const normalized = normalizePrices(data);
     if (normalized) {
-      setPrices(normalized);
+      setPrices({ xrp: normalized.xrp, xlm: normalized.xlm });
+      setPriceMeta({
+        cachedAt: normalized.cachedAt,
+        nextUpdateAt: normalized.nextUpdateAt,
+        ttlMinutes: normalized.ttlMinutes,
+      });
       setError(null);
       setLoading(false);
     }
@@ -28,26 +41,20 @@ export const CryptoProvider = ({ children }) => {
       const res = await fetch(`${API_BASE_URL}/api/crypto/prices`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to load prices");
-      const normalized = normalizePrices(data);
-      if (!normalized) throw new Error("Price data unavailable");
-      setPrices(normalized);
-      setError(null);
-      setLoading(false);
-      return normalized;
+      applyPrices(data);
+      return normalizePrices(data);
     } catch (e) {
       setError(e.message);
       setLoading(false);
       return null;
     }
-  }, []);
+  }, [applyPrices]);
 
   useEffect(() => {
     let eventSource;
     let pollInterval;
 
     refreshPrices();
-
-    pollInterval = setInterval(refreshPrices, 30000);
 
     const startSSE = () => {
       try {
@@ -65,11 +72,12 @@ export const CryptoProvider = ({ children }) => {
           eventSource = null;
         };
       } catch {
-        /* SSE optional — polling handles ngrok */
+        /* SSE optional */
       }
     };
 
     startSSE();
+    pollInterval = setInterval(refreshPrices, PRICE_POLL_MS);
 
     return () => {
       eventSource?.close();
@@ -83,7 +91,7 @@ export const CryptoProvider = ({ children }) => {
 
   return (
     <CryptoContext.Provider
-      value={{ prices, loading, error, toXrp, toXlm, formatDualPrice, refreshPrices }}
+      value={{ prices, priceMeta, loading, error, toXrp, toXlm, formatDualPrice, refreshPrices }}
     >
       {children}
     </CryptoContext.Provider>

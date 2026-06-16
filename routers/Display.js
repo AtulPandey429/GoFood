@@ -4,7 +4,7 @@ const FoodRepository = require("../repositories/FoodRepository");
 const { normalizeFoodItems } = require("../utils/normalizeFoodOptions");
 
 router.post("/fooditems", async (req, res) => {
-  const data = FoodRepository.getAll();
+  const data = await FoodRepository.getAll();
   res.json([normalizeFoodItems(data.items), data.categories]);
 });
 

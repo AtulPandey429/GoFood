@@ -13,7 +13,7 @@ async function initialize() {
         "[db] Auth failed — check Atlas: correct username/password in URL, IP whitelisted, database user has readWrite on 'gofood'"
       );
     }
-    seedGlobals();
+    await seedGlobals();
     return { type: "memory" };
   }
 }

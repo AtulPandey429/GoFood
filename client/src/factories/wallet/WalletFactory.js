@@ -1,6 +1,5 @@
 import GemWallet from "./GemWallet";
 import FreighterWallet from "./FreighterWallet";
-import SandboxWallet from "./SandboxWallet";
 
 const WalletFactory = {
   create(type) {
@@ -9,9 +8,8 @@ const WalletFactory = {
         return new GemWallet();
       case "freighter":
         return new FreighterWallet();
-      case "sandbox":
       default:
-        return new SandboxWallet();
+        throw new Error(`Unknown wallet type: ${type}`);
     }
   },
 };

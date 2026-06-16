@@ -16,8 +16,8 @@ const signToken = (user) => {
 
 const authService = {
   async registerUser({ name, email, password, location }) {
-    if (!name || !email || !password || !location) {
-      throw new Error("All fields are mandatory");
+    if (!name || !email || !password) {
+      throw new Error("Name, email, and password are required");
     }
     const existing = await UserRepository.findByEmail(email);
     if (existing) {
@@ -32,7 +32,7 @@ const authService = {
       name,
       email,
       password: securePassword,
-      location,
+      location: location || "",
     });
     return UserRepository.toSafeUser(user);
   },
@@ -71,6 +71,20 @@ const authService = {
       err.statusCode = 403;
       throw err;
     }
+    await this._verifyWalletSignature({ walletAddress, walletType, signature, nonce, publicKey });
+
+    const user = await UserRepository.upsertWalletUser({ walletAddress, walletType });
+    const token = signToken(user);
+    return { token, user: UserRepository.toSafeUser(user) };
+  },
+
+  async _verifyWalletSignature({ walletAddress, walletType, signature, nonce, publicKey }) {
+    const typeCheck = validateWalletType(walletType);
+    if (!typeCheck.valid) {
+      const err = new Error(typeCheck.message);
+      err.statusCode = 403;
+      throw err;
+    }
     const expiresAt = challenges.get(nonce);
     if (!expiresAt || new Date(expiresAt) < new Date()) {
       challenges.delete(nonce);
@@ -82,10 +96,20 @@ const authService = {
     const verifier = WalletAuthFactory.create(walletType);
     const valid = await verifier.verifySignature(walletAddress, nonce, signature, publicKey);
     if (!valid) throw new Error("Invalid wallet signature");
+  },
 
-    const user = await UserRepository.upsertWalletUser({ walletAddress, walletType });
-    const token = signToken(user);
-    return { token, user: UserRepository.toSafeUser(user) };
+  async linkWalletToUser(userId, { walletAddress, walletType, signature, nonce, publicKey }) {
+    await this._verifyWalletSignature({ walletAddress, walletType, signature, nonce, publicKey });
+    const user = await UserRepository.linkWalletToUser(userId, { walletAddress, walletType });
+    return UserRepository.toSafeUser(user);
+  },
+
+  async linkEmailToUser(userId, { email, password }) {
+    if (!email || !password) {
+      throw new Error("Email and password are required");
+    }
+    const user = await UserRepository.linkEmailToUser(userId, { email, password });
+    return UserRepository.toSafeUser(user);
   },
 
   async getProfile(userId) {

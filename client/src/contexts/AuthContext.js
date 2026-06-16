@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import ApiClient from "../factories/api/ApiClient";
-
+import { clearWalletSession } from "../utils/walletSession";
+import { isAdminRole } from "../constants/roles";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -45,15 +46,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    clearWalletSession();
     localStorage.removeItem("authToken");
     localStorage.removeItem("userEmail");
     setToken(null);
     setUser(null);
   };
 
+  const role = user?.role || null;
+  const isAdmin = isAdminRole(role);
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, fetchMe, updateUser, isAdmin: user?.isAdmin }}>
-      {children}
+    <AuthContext.Provider value={{ user, token, loading, login, logout, fetchMe, updateUser, role, isAdmin }}>      {children}
     </AuthContext.Provider>
   );
 };

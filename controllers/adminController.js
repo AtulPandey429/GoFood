@@ -23,7 +23,7 @@ exports.getUsers = asyncHandler(async (req, res) => {
 });
 
 exports.getFoodItems = asyncHandler(async (req, res) => {
-  const data = adminService.getFoodItems();
+  const data = await adminService.getFoodItems();
   res.json({ success: true, ...data });
 });
 
@@ -40,4 +40,22 @@ exports.updateFoodItem = asyncHandler(async (req, res) => {
 exports.deleteFoodItem = asyncHandler(async (req, res) => {
   await adminService.deleteFoodItem(req.params.id);
   res.json({ success: true });
+});
+
+exports.getMenuAgentStatus = asyncHandler(async (req, res) => {
+  res.json({ success: true, ...adminService.getMenuAgentStatus() });
+});
+
+exports.suggestMenuItem = asyncHandler(async (req, res) => {
+  const result = await adminService.suggestMenuItem(req.body.prompt);
+  res.json({ success: true, ...result });
+});
+
+exports.createMenuItemFromPrompt = asyncHandler(async (req, res) => {
+  if (req.body.item) {
+    const item = await adminService.createFoodItem(req.body.item);
+    return res.json({ success: true, item, source: "manual" });
+  }
+  const result = await adminService.createMenuItemFromPrompt(req.body.prompt);
+  res.json({ success: true, ...result, source: "agent" });
 });

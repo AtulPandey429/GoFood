@@ -2,19 +2,13 @@ import { ensureGemInstalled, unwrapGemResponse } from "../../utils/gemWalletResp
 
 class GemWallet {
   async connect() {
-    const { isInstalled, getAddress, getPublicKey } = await import("@gemwallet/api");
+    const { isInstalled, getPublicKey } = await import("@gemwallet/api");
 
     await ensureGemInstalled(isInstalled);
 
-    const addressResponse = await getAddress();
-    const address = unwrapGemResponse(addressResponse, "address");
-
     const keyResponse = await getPublicKey();
     const publicKey = unwrapGemResponse(keyResponse, "publicKey");
-    const keyAddress = keyResponse.result?.address;
-    if (keyAddress && keyAddress !== address) {
-      throw new Error("Gem Wallet address mismatch — try reconnecting");
-    }
+    const address = keyResponse.result?.address || unwrapGemResponse(keyResponse, "address");
 
     return { address, publicKey, walletType: "gem" };
   }

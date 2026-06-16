@@ -21,15 +21,28 @@ personal/
 ├── app.js                 # Express entry point
 ├── Config/                # env.js, db.js
 ├── constants/             # order status, payment methods, wallet types
-├── factories/             # database, wallet, payment, notification, priceFeed
-├── services/              # auth, order, admin, notification, price
-├── repositories/          # User, Order, Food data access
+├── domain/                # OrderBuilder, OrderMapper
+├── factories/             # database, repository, wallet, payment, notification
+├── repositories/          # Data access (Mongo + in-memory fallback)
 ├── controllers/           # Thin route handlers
 ├── routers/               # auth, orders, admin, display, user
 ├── middleware/            # auth, admin, validation, errorHandler
 ├── seeds/                 # Default food menu data
 └── client/                # React frontend
 ```
+
+## Database collections (normalized)
+
+| Collection | Purpose |
+|------------|---------|
+| `Users` | Accounts, wallet, notifications, `coinBalance` (future coins) |
+| `orders` | **One document per order** (items, payment, delivery, timeline) |
+| `food_items` / `food_category` | Menu catalog (Mongoose models) |
+| `coin_ledger` | Stub — future loyalty coin transactions |
+| `reviews` | Stub — future food/order reviews |
+| `notifications` | Stub — future in-app notification inbox |
+
+**Fresh start:** Legacy `order` collection (nested `order_data` per user email) is no longer read. Drop it in MongoDB if migrating to a clean slate.
 
 ## Setup
 
@@ -51,7 +64,7 @@ npm run dev    # Starts backend (port 3000) + React dev server (port 3000 proxy)
 | `PORT` | No | Server port (default 3000) |
 | `SANDBOX_MODE` | No | `true` enables wallet sandbox (default in dev) |
 | `TELEGRAM_BOT_TOKEN` | No | Telegram bot for notifications |
-| `ADMIN_EMAIL` | No | Auto-promote this email to admin on startup |
+| `ADMIN_EMAIL` | No | Auto-promote this email to **admin** role on startup |
 | `MERCHANT_XRP_ADDRESS` | No | XRP receive address for crypto checkout |
 | `MERCHANT_XLM_ADDRESS` | No | XLM receive address for crypto checkout |
 

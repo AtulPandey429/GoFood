@@ -28,6 +28,8 @@ const env = {
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",
   TELEGRAM_BOT_USERNAME: process.env.TELEGRAM_BOT_USERNAME || "",
   TELEGRAM_LOGIN_DOMAIN: process.env.TELEGRAM_LOGIN_DOMAIN || "",
+  TELEGRAM_PUBLIC_APP_URL:
+    process.env.TELEGRAM_PUBLIC_APP_URL || process.env.CLIENT_URL || "https://gofood-latest.onrender.com",
   DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN || "",
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID || "",
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET || "",
@@ -37,6 +39,18 @@ const env = {
   MERCHANT_XLM_ADDRESS: process.env.MERCHANT_XLM_ADDRESS || "",
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || "",
   COINGECKO_API_KEY: process.env.COINGECKO_API_KEY || "",
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o-mini",
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
+  GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  GROQ_API_KEY: process.env.GROQ_API_KEY || "",
+  GROQ_MODEL: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || "",
+  OPENROUTER_MODEL: process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+  CEREBRAS_API_KEY: process.env.CEREBRAS_API_KEY || "",
+  CEREBRAS_MODEL: process.env.CEREBRAS_MODEL || "llama3.1-8b",
+  MENU_AI_PROVIDER_ORDER:
+    process.env.MENU_AI_PROVIDER_ORDER || "gemini,groq,openrouter,cerebras,openai",
   CORS_ORIGIN: process.env.CORS_ORIGIN || "",
 };
 

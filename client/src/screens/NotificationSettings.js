@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import ApiClient from "../factories/api/ApiClient";
 import { useAuth } from "../contexts/AuthContext";
 import TelegramLinkOptions from "../components/TelegramLinkOptions";
@@ -16,6 +17,8 @@ const NotificationSettings = () => {
   });
   const [message, setMessage] = useState("");
   const [testing, setTesting] = useState(false);
+  const [linkEmailForm, setLinkEmailForm] = useState({ email: "", password: "" });
+  const [linkingEmail, setLinkingEmail] = useState(false);
 
   const notifications = user?.notifications || {};
   const telegramLinked = Boolean(notifications.telegramVerified || notifications.telegramUserId);
@@ -66,6 +69,21 @@ const NotificationSettings = () => {
     }
   };
 
+  const handleLinkEmail = async (e) => {
+    e.preventDefault();
+    setLinkingEmail(true);
+    try {
+      const res = await ApiClient.post("/api/auth/link-email", linkEmailForm);
+      await fetchMe();
+      setLinkEmailForm({ email: "", password: "" });
+      setMessage(res.message || "Email linked!");
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setLinkingEmail(false);
+    }
+  };
+
   const handleDiscordLink = async () => {
     try {
       const { url } = await ApiClient.get("/api/auth/discord/link/start");
@@ -76,30 +94,65 @@ const NotificationSettings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="page-shell">
       <Navbar />
-      <main className="max-w-lg mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold text-white mb-1">Alerts &amp; Login</h1>
-        <p className="text-slate-400 text-sm mb-8">
-          Link Telegram or Discord with one click — no Chat ID to copy.
-        </p>
+      <main className="page-container-narrow">
+        <header className="page-header">
+          <h1 className="page-title">Alerts &amp; Login</h1>
+          <p className="page-subtitle">
+            Link Telegram or Discord with one click — no Chat ID to copy.
+          </p>
+        </header>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-8">
-          {message && (
-            <div className="px-4 py-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-300 text-sm">
-              {message}
-            </div>
+        <div className="section-card-body space-y-8">
+          {message && <div className="alert-info">{message}</div>}
+
+          {user?.hasWallet && !user?.hasEmail && (
+            <section className="space-y-3 p-4 rounded-xl bg-slate-800/50 border border-slate-700">
+              <h2 className="font-semibold text-white">Add email login</h2>
+              <p className="text-sm text-slate-400">
+                Connect email and password to the same account as your wallet ({user.walletAddress?.slice(0, 12)}…).
+              </p>
+              <form onSubmit={handleLinkEmail} className="space-y-3">
+                <input
+                  className="input-field"
+                  type="email"
+                  placeholder="Email"
+                  value={linkEmailForm.email}
+                  onChange={(e) => setLinkEmailForm({ ...linkEmailForm, email: e.target.value })}
+                  required
+                />
+                <input
+                  className="input-field"
+                  type="password"
+                  placeholder="Password (min 6 characters)"
+                  minLength={6}
+                  value={linkEmailForm.password}
+                  onChange={(e) => setLinkEmailForm({ ...linkEmailForm, password: e.target.value })}
+                  required
+                />
+                <button type="submit" className="btn-primary text-sm" disabled={linkingEmail}>
+                  {linkingEmail ? "Linking…" : "Link email to this account"}
+                </button>
+              </form>
+            </section>
+          )}
+
+          {user?.hasEmail && !user?.hasWallet && (
+            <section className="p-4 rounded-xl bg-slate-800/50 border border-slate-700 text-sm text-slate-400">
+              Use <strong className="text-slate-200">Connect Wallet</strong> in the navbar to link a wallet to this email account. The same wallet cannot be used on a separate account.
+            </section>
           )}
 
           <section className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <h2 className="font-semibold text-white">Telegram</h2>
               {telegramLinked ? (
-                <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <span className="badge-emerald">
                   Linked @{notifications.telegramUsername || notifications.telegramUserId}
                 </span>
               ) : (
-                <span className="text-xs text-amber-400">Not linked</span>
+                <span className="badge-amber">Not linked</span>
               )}
             </div>
 
@@ -119,7 +172,7 @@ const NotificationSettings = () => {
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                className="w-4 h-4 rounded border-slate-600"
+                className="w-4 h-4 rounded border-slate-600 accent-red-500"
                 checked={prefs.enableTelegram}
                 disabled={!telegramLinked}
                 onChange={(e) => setPrefs({ ...prefs, enableTelegram: e.target.checked })}
@@ -142,14 +195,14 @@ const NotificationSettings = () => {
           <hr className="border-slate-800" />
 
           <section className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <h2 className="font-semibold text-white">Discord</h2>
               {discordLinked ? (
-                <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <span className="badge-emerald">
                   Linked {notifications.discordUsername || notifications.discordUserId}
                 </span>
               ) : (
-                <span className="text-amber-400 text-xs">Not linked</span>
+                <span className="badge-amber">Not linked</span>
               )}
             </div>
 
@@ -157,16 +210,16 @@ const NotificationSettings = () => {
               <button
                 type="button"
                 onClick={handleDiscordLink}
-                className="w-full py-2.5 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-500 text-white text-sm"
+                className="w-full py-2.5 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-500 text-white text-sm transition-colors"
               >
-                Link Discord account (login)
+                Link Discord account
               </button>
             )}
 
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                className="w-4 h-4 rounded border-slate-600"
+                className="w-4 h-4 rounded border-slate-600 accent-red-500"
                 checked={prefs.enableDiscord}
                 onChange={(e) => setPrefs({ ...prefs, enableDiscord: e.target.checked })}
               />
@@ -200,6 +253,7 @@ const NotificationSettings = () => {
           </button>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

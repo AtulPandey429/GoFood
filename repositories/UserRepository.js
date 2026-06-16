@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-const Contacts = require("../model/Contacts");
+const User = require("../model/User");
+const { ROLES, resolveRole } = require("../constants/roles");
+const { hasRealEmail, getDisplayIdentity } = require("../utils/userIdentity");
 
 const memoryUsers = [];
 let memoryIdCounter = 1;
@@ -13,11 +15,14 @@ const toPlainNotifications = (notifications) => {
 const toSafeUser = (user) => ({
   id: user._id?.toString() || user.id,
   name: user.name,
-  email: user.email,
+  email: hasRealEmail(user) ? user.email : null,
+  displayIdentity: getDisplayIdentity(user),
+  hasEmail: hasRealEmail(user),
+  hasWallet: Boolean(user.walletAddress),
   location: user.location,
-  isAdmin: user.isAdmin || false,
-  walletAddress: user.walletAddress,
-  walletType: user.walletType,
+  role: resolveRole(user),
+  walletAddress: user.walletAddress || null,
+  walletType: user.walletType || null,
   notifications: toPlainNotifications(user.notifications),
 });
 
@@ -28,32 +33,32 @@ const UserRepository = {
 
   async create(data) {
     if (this._useMemory()) {
-      const user = { id: String(memoryIdCounter++), ...data, isAdmin: false, notifications: {} };
+      const user = { id: String(memoryIdCounter++), ...data, role: ROLES.USER, isAdmin: false, notifications: {} };
       memoryUsers.push(user);
       return user;
     }
-    return Contacts.create(data);
+    return User.create(data);
   },
 
   async findByEmail(email) {
     if (this._useMemory()) {
       return memoryUsers.find((u) => u.email === email) || null;
     }
-    return Contacts.findOne({ email });
+    return User.findOne({ email });
   },
 
   async findById(id) {
     if (this._useMemory()) {
       return memoryUsers.find((u) => u.id === id || u._id?.toString() === id) || null;
     }
-    return Contacts.findById(id);
+    return User.findById(id);
   },
 
   async findByWalletAddress(walletAddress) {
     if (this._useMemory()) {
       return memoryUsers.find((u) => u.walletAddress === walletAddress) || null;
     }
-    return Contacts.findOne({ walletAddress });
+    return User.findOne({ walletAddress });
   },
 
   async findByTelegramUserId(telegramUserId) {
@@ -61,7 +66,7 @@ const UserRepository = {
     if (this._useMemory()) {
       return memoryUsers.find((u) => u.notifications?.telegramUserId === id) || null;
     }
-    return Contacts.findOne({ "notifications.telegramUserId": id });
+    return User.findOne({ "notifications.telegramUserId": id });
   },
 
   async findByDiscordUserId(discordUserId) {
@@ -69,7 +74,7 @@ const UserRepository = {
     if (this._useMemory()) {
       return memoryUsers.find((u) => u.notifications?.discordUserId === id) || null;
     }
-    return Contacts.findOne({ "notifications.discordUserId": id });
+    return User.findOne({ "notifications.discordUserId": id });
   },
 
   async findAll() {
@@ -79,28 +84,35 @@ const UserRepository = {
         return safe;
       });
     }
-    return Contacts.find({}, "-password").lean();
+    return User.find({}, "-password").lean();
   },
 
   async count() {
     if (this._useMemory()) return memoryUsers.length;
-    return Contacts.countDocuments();
+    return User.countDocuments();
   },
 
   async findOneAdmin() {
     if (this._useMemory()) {
-      return memoryUsers.find((u) => u.isAdmin) || null;
+      return memoryUsers.find((u) => resolveRole(u) === ROLES.ADMIN) || null;
     }
-    return Contacts.findOne({ isAdmin: true });
+    return User.findOne({ $or: [{ role: ROLES.ADMIN }, { isAdmin: true }] });
   },
 
   async promoteToAdmin(email) {
     if (this._useMemory()) {
       const user = memoryUsers.find((u) => u.email === email);
-      if (user) user.isAdmin = true;
+      if (user) {
+        user.role = ROLES.ADMIN;
+        user.isAdmin = true;
+      }
       return user;
     }
-    return Contacts.findOneAndUpdate({ email }, { isAdmin: true }, { new: true });
+    return User.findOneAndUpdate(
+      { email },
+      { role: ROLES.ADMIN, isAdmin: true },
+      { new: true }
+    );
   },
 
   async updateById(id, data) {
@@ -111,7 +123,7 @@ const UserRepository = {
       const { password, ...safe } = memoryUsers[idx];
       return safe;
     }
-    return Contacts.findByIdAndUpdate(id, data, { new: true }).select("-password");
+    return User.findByIdAndUpdate(id, data, { new: true }).select("-password");
   },
 
   async upsertWalletUser({ walletAddress, walletType, name }) {
@@ -119,13 +131,43 @@ const UserRepository = {
     if (!user) {
       user = await this.create({
         name: name || `Wallet ${walletAddress.slice(0, 8)}`,
-        email: `${walletAddress.slice(0, 12)}@wallet.local`,
         location: "Web3",
         walletAddress,
         walletType,
       });
     }
     return user;
+  },
+
+  async linkWalletToUser(userId, { walletAddress, walletType }) {
+    const owner = await this.findByWalletAddress(walletAddress);
+    const ownerId = owner?._id?.toString() || owner?.id;
+    if (owner && ownerId !== String(userId)) {
+      throw new Error("This wallet is already linked to another account");
+    }
+    const user = await this.findById(userId);
+    if (!user) throw new Error("User not found");
+    if (user.walletAddress && user.walletAddress !== walletAddress) {
+      throw new Error("Another wallet is already linked to this account");
+    }
+    return this.updateById(userId, { walletAddress, walletType });
+  },
+
+  async linkEmailToUser(userId, { email, password }) {
+    const user = await this.findById(userId);
+    if (!user) throw new Error("User not found");
+    if (hasRealEmail(user)) {
+      throw new Error("This account already has an email login");
+    }
+    const existing = await this.findByEmail(email);
+    const existingId = existing?._id?.toString() || existing?.id;
+    if (existing && existingId !== String(userId)) {
+      throw new Error("Email is already registered to another account");
+    }
+    const bcrypt = require("bcrypt");
+    const salt = await bcrypt.genSalt(10);
+    const securePassword = await bcrypt.hash(password, salt);
+    return this.updateById(userId, { email, password: securePassword });
   },
 
   async upsertTelegramUser({ telegramUserId, telegramUsername, telegramChatId, firstName, lastName }) {
@@ -196,6 +238,7 @@ const UserRepository = {
 
   toSafeUser,
   toPlainNotifications,
+  resolveRole,
 };
 
 module.exports = UserRepository;

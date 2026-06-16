@@ -1,29 +1,27 @@
 class FreighterWallet {
   async connect() {
-    try {
-      const { isConnected, getPublicKey, requestAccess } = await import(
-        "@stellar/freighter-api"
-      );
-      const connected = await isConnected();
-      if (!connected) {
-        const access = await requestAccess();
-        if (!access) throw new Error("Freighter access denied");
-      }
-      const address = await getPublicKey();
-      return { address, walletType: "freighter" };
-    } catch (e) {
-      throw new Error("Freighter not available: " + e.message);
+    const { isConnected, requestAccess } = await import("@stellar/freighter-api");
+
+    const installed = await isConnected();
+    if (!installed) {
+      throw new Error("Freighter extension not installed — get it at freighter.app");
     }
+
+    const address = await requestAccess();
+    if (!address) {
+      throw new Error("Freighter access denied");
+    }
+
+    return { address, walletType: "freighter" };
   }
 
   async signMessage(message) {
-    try {
-      const { signMessage } = await import("@stellar/freighter-api");
-      const result = await signMessage(message);
-      return result.signedMessage || result;
-    } catch (e) {
-      throw new Error("Freighter sign failed: " + e.message);
+    const { signMessage } = await import("@stellar/freighter-api");
+    const result = await signMessage(message);
+    if (result?.error) {
+      throw new Error(result.error.message || "Freighter sign failed");
     }
+    return result.signedMessage || result;
   }
 
   async sendPayment({ to, amount }) {

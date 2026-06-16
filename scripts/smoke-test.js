@@ -85,7 +85,7 @@ async function run(name, fn) {
       }),
     });
     const order = await orderRes.json();
-    if (!order.success) throw new Error(JSON.stringify(order));
+    if (!order.success || !order.orderId) throw new Error(JSON.stringify(order));
   });
 
   await check("GET /api/crypto/prices", async () => {

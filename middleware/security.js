@@ -1,6 +1,19 @@
 const jwt = require("jsonwebtoken");
 const env = require("../Config/env");
 const UserRepository = require("../repositories/UserRepository");
+const { isAdminRole } = require("../constants/roles");
+
+async function loadUserFromToken(token) {
+  const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET);
+  const user = await UserRepository.findById(decoded.user.id);
+  if (!user) return null;
+  return {
+    id: user._id ? user._id.toString() : user.id,
+    email: user.email,
+    name: user.name,
+    role: UserRepository.resolveRole(user),
+  };
+}
 
 async function sseAuthFromQuery(req, res, next) {
   const token = req.query.token;
@@ -8,15 +21,31 @@ async function sseAuthFromQuery(req, res, next) {
     return res.status(401).json({ success: false, message: "Token required" });
   }
   try {
-    const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET);
-    const user = await UserRepository.findById(decoded.user.id);
+    const user = await loadUserFromToken(token);
     if (!user) {
       return res.status(401).json({ success: false, message: "User not found" });
     }
-    req.user = {
-      id: user._id ? user._id.toString() : user.id,
-      email: user.email,
-    };
+    req.user = user;
+    next();
+  } catch {
+    return res.status(401).json({ success: false, message: "Invalid token" });
+  }
+}
+
+async function sseAdminFromQuery(req, res, next) {
+  const token = req.query.token;
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Token required" });
+  }
+  try {
+    const user = await loadUserFromToken(token);
+    if (!user) {
+      return res.status(401).json({ success: false, message: "User not found" });
+    }
+    if (!isAdminRole(user.role)) {
+      return res.status(403).json({ success: false, message: "Admin access required" });
+    }
+    req.user = user;
     next();
   } catch {
     return res.status(401).json({ success: false, message: "Invalid token" });
@@ -34,4 +63,4 @@ function securityHeaders(req, res, next) {
   next();
 }
 
-module.exports = { sseAuthFromQuery, securityHeaders };
+module.exports = { sseAuthFromQuery, sseAdminFromQuery, securityHeaders };

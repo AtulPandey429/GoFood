@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const env = require("../Config/env");
 const UserRepository = require("../repositories/UserRepository");
+const { resolveRole } = require("../constants/roles");
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -20,11 +21,13 @@ const authMiddleware = async (req, res, next) => {
 
     req.user = {
       id: user._id ? user._id.toString() : user.id,
-      email: user.email,
+      email: user.email || null,
       name: user.name,
-      isAdmin: user.isAdmin || false,
-      walletAddress: user.walletAddress,
-      walletType: user.walletType,
+      role: resolveRole(user),
+      walletAddress: user.walletAddress || null,
+      walletType: user.walletType || null,
+      hasEmail: UserRepository.toSafeUser(user).hasEmail,
+      hasWallet: Boolean(user.walletAddress),
       notifications: UserRepository.toPlainNotifications(user.notifications),
     };
     next();

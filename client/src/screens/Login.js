@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-import API_BASE_URL from "../config";
-
 import ApiClient from "../factories/api/ApiClient";
 
 import { useAuth } from "../contexts/AuthContext";
@@ -20,17 +18,15 @@ const Login = () => {
 
   const [error, setError] = useState("");
 
-  const [sandboxMode, setSandboxMode] = useState(true);
-
   const [providers, setProviders] = useState({ telegram: false, discord: false });
 
   const [searchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
-  const { login } = useAuth();
+  const { login, token } = useAuth();
 
-  const { connect, connecting } = useWallet();
+  const { openWalletModal, connecting, isConnected, error: walletError } = useWallet();
 
 
 
@@ -46,15 +42,13 @@ const Login = () => {
 
   useEffect(() => {
 
-    fetch(`${API_BASE_URL}/api/health`)
+    if (token && isConnected) navigate("/");
 
-      .then((r) => r.json())
-
-      .then((d) => setSandboxMode(Boolean(d.sandboxAllowed)))
-
-      .catch(() => setSandboxMode(false));
+  }, [token, isConnected, navigate]);
 
 
+
+  useEffect(() => {
 
     ApiClient.get("/api/auth/providers")
 
@@ -90,26 +84,7 @@ const Login = () => {
 
 
 
-  const handleWalletLogin = async (type) => {
-
-    setError("");
-
-    try {
-
-      await connect(type);
-
-      navigate("/");
-
-    } catch (err) {
-
-      setError(err.message);
-
-    }
-
-  };
-
-
-
+  const displayError = error || walletError;
   const handleTelegramLogin = async (telegramUser) => {
 
     setError("");
@@ -178,11 +153,11 @@ const Login = () => {
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
 
-          {error && (
+          {displayError && (
 
             <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
 
-              {error}
+              {displayError}
 
             </div>
 
@@ -253,65 +228,15 @@ const Login = () => {
 
 
           <div>
-
             <p className="text-center text-sm text-slate-400 mb-3">Web3 Wallet</p>
-
-            <div className="flex flex-wrap gap-2 justify-center">
-
-              <button
-
-                type="button"
-
-                className="btn-secondary text-sm"
-
-                disabled={connecting}
-
-                onClick={() => handleWalletLogin("gem")}
-
-              >
-
-                Gem Wallet
-
-              </button>
-
-              <button
-
-                type="button"
-
-                className="btn-secondary text-sm"
-
-                disabled={connecting}
-
-                onClick={() => handleWalletLogin("freighter")}
-
-              >
-
-                Freighter
-
-              </button>
-
-              {sandboxMode && (
-
-                <button
-
-                  type="button"
-
-                  className="btn-secondary text-sm border border-amber-500/50 text-amber-400"
-
-                  disabled={connecting}
-
-                  onClick={() => handleWalletLogin("sandbox")}
-
-                >
-
-                  Sandbox
-
-                </button>
-
-              )}
-
-            </div>
-
+            <button
+              type="button"
+              className="btn-secondary w-full py-3 text-sm"
+              disabled={connecting}
+              onClick={openWalletModal}
+            >
+              {connecting ? "Connecting…" : "Connect Wallet — Gem (XRP) or Freighter (XLM)"}
+            </button>
           </div>
 
 

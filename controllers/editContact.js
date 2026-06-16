@@ -2,7 +2,7 @@ const express = require("express");
 // const routes = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Contacts = require("../model/Contacts");
+const User = require("../model/User");
 const asyncHandler = require("express-async-handler");
 const CreateContacts = asyncHandler(async (req, res) => {
   console.log("here are apis", req.body);
@@ -10,15 +10,15 @@ const CreateContacts = asyncHandler(async (req, res) => {
   const securePassword = await bcrypt.hash(req.body.password, salt);
 
   const { name, email, password, location } = req.body;
-  if (!name || !email || !password || !location) {
+  if (!name || !email || !password) {
     res.status(400);
-    throw new Error("all field are mandatory");
+    throw new Error("Name, email, and password are required");
   }
-  const createCont = await Contacts.create({
+  const createCont = await User.create({
     name,
     email,
     password: securePassword,
-    location,
+    location: location || "",
   });
   res.status(200).json(createCont);
 });
@@ -26,7 +26,7 @@ const LoginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const userData = await Contacts.findOne({ email });
+    const userData = await User.findOne({ email });
 
     if (!userData) {
       return res.status(400).json({ errors: "Incorrect email or password" });

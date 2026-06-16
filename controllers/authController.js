@@ -27,6 +27,16 @@ exports.walletLogin = asyncHandler(async (req, res) => {
   res.json({ success: true, authToken: token, user });
 });
 
+exports.linkWallet = asyncHandler(async (req, res) => {
+  const user = await authService.linkWalletToUser(req.user.id, req.body);
+  res.json({ success: true, user, message: "Wallet linked to your account" });
+});
+
+exports.linkEmail = asyncHandler(async (req, res) => {
+  const user = await authService.linkEmailToUser(req.user.id, req.body);
+  res.json({ success: true, user, message: "Email login added to your account" });
+});
+
 exports.authProviders = asyncHandler(async (req, res) => {
   const providers = authService.getAuthProviders();
   const env = require("../Config/env");
