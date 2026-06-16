@@ -26,6 +26,7 @@ COPY Config ./Config
 COPY app.js ./
 COPY constants ./constants
 COPY controllers ./controllers
+COPY domain ./domain
 COPY factories ./factories
 COPY middleware ./middleware
 COPY model ./model
